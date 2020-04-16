@@ -1,5 +1,3 @@
-# postnl-ecs
-Integrator plugin for PostNL ECS
 Release 1.9.2.4 - 18-05-2019
 - Fix issues with PostNL tracking code
 - Fix issue to not process shipment file if already processed.
@@ -24,3 +22,5 @@ Release 1.9.1 30-04-2019
 Release 1.9: 18-04-2019
 - Tested compatbile on Wordpress 5.1.1 and WooCommerce 3.5.8
 - Fixes: File deletes after successfully importing of files.
+
+ 

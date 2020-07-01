@@ -95,7 +95,7 @@
 						}
 				}
 		if ($Cron == '0') {
-					stop_cron_shipment();
+					postnlecs_stop_cron_shipment();
 				} else {
 						wp_clear_scheduled_hook('task_shipement_import');
 						if (!wp_next_scheduled('task_shipement_import')) {
@@ -117,10 +117,10 @@
 		}
 		$EcsShipmentSettings->displayShipmentSettings($Cron,$Path, $tracking, $Inform);
 		 echo "<script>
-$(document).ready(function(){
-$('#collapse5').collapse('show');
-});
-</script>";
+		$(document).ready(function(){
+			$('#collapse5').collapse('show');
+		});
+	</script>";
 		
         
        

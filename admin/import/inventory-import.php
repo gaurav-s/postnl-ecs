@@ -84,7 +84,7 @@
 				$obj = new ni_order_list();
 				$obj->inventoryImport();
 			if ($Cron == '0') {
-						stop_cron_inventory();
+						postnlecs_stop_cron_inventory();
 				} else {
 					  $obj =  new ni_order_list();
 					 						$obj->inventoryImport();

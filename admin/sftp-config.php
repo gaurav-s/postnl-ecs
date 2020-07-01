@@ -119,7 +119,7 @@
 						if ($k->keytext == "Port") $EcsSftpSettings->updateSettingsValues($k->id,$port);						
 					}
 				}
-				 $EcsSftpSettings->displaySftpSettings($host,$host, $pass, $port);
+				 $EcsSftpSettings->displaySftpSettings($host,$user, $pass, $port);
 			}
             
         }

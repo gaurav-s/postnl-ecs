@@ -88,14 +88,31 @@ class ecsOrderSettings {
 	
 	public function getShippingTypesList()
     {
-      $ShippingTypes = array("flat_rate","free_shipping","international_delivery","local_delivery","local_pickup","disabled");
+        $shippingMethods = WC()->shipping->get_shipping_methods();
+        
+        $ShippingTypes = [];
+        foreach ( $shippingMethods as $id => $shipping_method ) {
+            
+        
+            //if ( isset( $shipping_method->enabled ) && 'yes' === $shipping_method->enabled ) {
+                //$method_title = $shipping_method->get_method_title();
+                $method_title = $id;
+				
+				array_push( $ShippingTypes, $method_title );
+			//}
+		}
+        
+        $ShippingTypes[] = 'disabled';
+      
 	  return $ShippingTypes;
     }
 	
 	 public function getOrderStatusList()
     {
-      $OrderStatus = array("on-hold","pending","failed","processing","completed","refunded","cancelled");
-	  return $OrderStatus;
+        
+        $wooOrderStatus = wc_get_order_statuses();
+        return $wooOrderStatus;
+        
     }
     
 	public function displayOrderExpSettings($Cron,$Path, $Shipping, $Status, $no   ) {
@@ -192,9 +209,9 @@ class ecsOrderSettings {
 				<div class="col-md-4">
 				<select id="selectbasic" name="Status[]" class="form-control"  required="true"  multiple="multiple" >
 				';
-				foreach($OrderStatus as $OrderStatusValue) {
+				foreach($OrderStatus as $orderStatusKey => $OrderStatusValue) {
 								
-									echo '            <option value="'.$OrderStatusValue.'">'.$OrderStatusValue.'</option>';
+									echo '            <option value="'.$orderStatusKey.'">'.$OrderStatusValue.'</option>';
 							
 							
 							}
@@ -216,13 +233,13 @@ class ecsOrderSettings {
 			
 			$selectedOrderStatus = explode(":",$Status);
 			
-			foreach($OrderStatus as $OrderStatusValue) {
-				if(in_array($OrderStatusValue,$selectedOrderStatus)) {
-					echo '            <option value="'.$OrderStatusValue.'" selected="selected" >'.$OrderStatusValue.'</option>
+			foreach($OrderStatus as $orderStatusKey => $OrderStatusValue) {
+				if(in_array($orderStatusKey,$selectedOrderStatus)) {
+					echo '            <option value="'.$orderStatusKey.'" selected="selected" >'.$OrderStatusValue.'</option>
 ';
 					}
 				else {
-					echo '            <option value="'.$OrderStatusValue.'">'.$OrderStatusValue.'</option>';
+					echo '            <option value="'.$orderStatusKey.'">'.$OrderStatusValue.'</option>';
 				}
 					
 			

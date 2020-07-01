@@ -1,12 +1,24 @@
 # postnl-ecs
 Integrator plugin for PostNL ECS
+
+Release 2.0.0.1 - 01-07-2020
+- Fix issues with PostNL tracking code.
+- Dynamic order status and shipping options.
+- Add additional countries in EU list
+- Compatibility with woocommerce 4.0
+- Added an option to specify EAN attribute in the settings
+- Used product title in Product export and not url
+- Fixed issue in Stock import.
+- Moved plugin under woocommerce menu
+
+
 Release 1.9.2.4 - 18-05-2019
 - Fix issues with PostNL tracking code
 - Fix issue to not process shipment file if already processed.
 
-
 Release 1.9.2.3 - 16-05-2019
 - Fix issue with extra space in Address when only Address Line 1 is used.
+
 Release 1.9.2.2 - 15-05-2019
 - Added more shipping code support from WooCommerce PostNL plugin
 

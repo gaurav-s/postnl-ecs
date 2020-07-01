@@ -14,15 +14,15 @@
 				<legend></legend>
 				<!-- Text input-->
 				<?php
-				require_once(__DIR__ . "/EcsProductSettings.php");
-				require_once(dirname(__DIR__) . "/ecsSftpProcess.php");
+				require_once(ECS_PATH. "/admin/export/EcsProductSettings.php");
+				require_once(ECS_PATH. "/admin/ecsSftpProcess.php");
 		 
 				$EcsProductSettings = ecsProductSettings::init();
     if (!isset($_POST['ProductExport'])) {
         global $wpdb;
         $Cron           = '';
         $Path           = '';
-        $informcustomer = '';
+        $ean_field = '';
         $cron           = '';
         $enable         = '';
         $lastfile       = '';
@@ -44,10 +44,13 @@
 				if ($k->keytext == "no") {
 					$no = $k->value;
 				}
+				if ($k->keytext == "ean_attribute") {
+					$ean_field = $k->value;
+				}
 			}
 		}
 		
-		$EcsProductSettings->displayProductExpSettings($Cron, $Path, $no);
+		$EcsProductSettings->displayProductExpSettings($Cron, $Path, $no, $ean_field);
 		
 	
     }
@@ -60,7 +63,8 @@
         $port       = 22;
         //$Enable     = $_POST["Enable"];
         //$Last       = $_POST["Last"];
-        $Cron       = $_POST["Cron"];
+		$Cron       = $_POST["Cron"];
+		$ean_field = $_POST["ean_attribute"];;
         //$Shipping   = $_POST["Shipping"];
         //$Status     = $_POST["Status"];
         $Path       = $_POST["Path"];
@@ -81,21 +85,30 @@
 				//$EcsProductSettings->saveSettingsValues($id,'Shipping',$Shipping);
 				$EcsProductSettings->saveSettingsValues($id,'Path',$Path);
 				$EcsProductSettings->saveSettingsValues($id,'no',$no);
+				$EcsProductSettings->saveSettingsValues($id,'ean_attribute',$ean_field);
 				
 				
 			} else {
 			$statesmeta = $EcsProductSettings->getSettingValues($settingID);
+			$eanfieldSet = false;
 			foreach ($statesmeta as $k) {
 									
 					if ($k->keytext == "Cron") $EcsProductSettings->updateSettingsValues($k->id,$Cron);
 					if ($k->keytext == "Path") $EcsProductSettings->updateSettingsValues($k->id,$Path);
 					if ($k->keytext == "no") $EcsProductSettings->updateSettingsValues($k->id,$no);
+					if ($k->keytext == "ean_attribute") {
+						$EcsProductSettings->updateSettingsValues($k->id,$ean_field);
+						$eanfieldSet = true;
+					}
 				
 				}
+				
+				if(!$eanfieldSet)
+					$EcsProductSettings->saveSettingsValues($settingID,'ean_attribute',$ean_field);
 			
 			}
 			if ($Cron == '0') {
-					stop_cron_product();
+				postnlecs_stop_cron_product();
 			} else {
 					 	 //orderfunction12();
 						 //$obj =  new ni_order_list();
@@ -119,7 +132,7 @@
 		
 		
 		}
-		$EcsProductSettings->displayProductExpSettings($Cron, $Path, $no);
+		$EcsProductSettings->displayProductExpSettings($Cron, $Path, $no, $ean_field);
 		 echo "<script>
 				$(document).ready(function(){
 				$('#collapse3').collapse('show');

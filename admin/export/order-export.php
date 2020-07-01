@@ -122,13 +122,12 @@
 				
 				
 				}
-				orderfunction12();
-					$obj = new ni_order_list();
-					$obj->orderExport();
-					
+				
+					$postnlOrder = new PostNLOrder();
+					$postnlOrder->processOrders();
 					//cron_order_export
 					if ($Cron == '0') {
-						stop_cron_order();
+						postnlecs_stop_cron_order();
 					} else {
 						
 						

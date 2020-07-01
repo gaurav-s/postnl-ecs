@@ -88,88 +88,100 @@ class ecsProductSettings {
 	
 	
     
-	public function displayProductExpSettings($Cron,$Path, $no   ) {
-		        echo '<div class="form-group">
-<label class="col-md-4 control-label" for="textinput">Path</label>  
-<div class="col-md-4">
-<input id="textinput" name="Path" type="text" placeholder="Path" required="true" class="form-control input-md" value=' . $Path . '>
-<span class="help-block">For example /Products</span>  
-</div>
-</div>
-';
-        echo '<div class="form-group">
-<label class="col-md-4 control-label" for="textinput">Number of Products per file</label>  
-<div class="col-md-4">
-<input id="textinput" name="no" type="number" placeholder="number" required="true" class="form-control input-md" value=' . $no . '>
-<span class="help-block">For example 3,5,10</span>  
-</div>
-</div>
-';
+	public function displayProductExpSettings($Cron,$Path, $no,$ean_field   ) {
+        //Path Field
+        echo    '<div class="form-group">
+                    <label class="col-md-4 control-label" for="textinput">Path</label>  
+                    <div class="col-md-4">
+                        <input id="textinput" name="Path" type="text" placeholder="Path" required="true" class="form-control input-md" value=' . $Path . '>
+                        <span class="help-block">For example /Products</span>  
+                    </div>
+                </div>
+                ';
+        //No of Products
+        echo    '<div class="form-group">
+                    <label class="col-md-4 control-label" for="textinput">Number of Products per file</label>  
+                        <div class="col-md-4">
+                        <input id="textinput" name="no" type="number" placeholder="number" required="true" class="form-control input-md" value=' . $no . '>
+                        <span class="help-block">For example 3,5,10</span>  
+                    </div>
+                </div>
+                ';
+        echo    '<div class="form-group">
+                <label class="col-md-4 control-label" for="textinput">Attribute code of EAN</label>  
+                    <div class="col-md-4">
+                    <input id="textinput" name="ean_attribute" type="text" placeholder="ean"  class="form-control input-md" value=' . $ean_field . '>
+                    <span class="help-block">For example ean</span>  
+                </div>
+            </div>
+            ';
         if ($Cron == '') {
             echo '
-<!-- Select Basic -->
-<div class="form-group">
-<label class="col-md-4 control-label" for="selectbasic">Cron schedule</label>
-<div class="col-md-4">
-<select id="selectbasic" name="Cron" class="form-control">
-<option value="15min">15 min</option>
-<option value="30min">30 min</option>
-<option value="1hour"  >1 hour</option>
-<option value="2hour">2 hour</option>
-<option value="4hour">4 hour</option>
-<option value="1day">1 daily</option>
-<option value="0" selected="selected" >Stop</option>
-</select>
-<span class="help-block">Pick a schedule</span>  
-</div>
-</div>';
+                    <!-- Select Basic -->
+                    <div class="form-group">
+                        <label class="col-md-4 control-label" for="selectbasic">Cron schedule</label>
+                        <div class="col-md-4">
+                        <select id="selectbasic" name="Cron" class="form-control">
+                            <option value="15min">15 min</option>
+                            <option value="30min">30 min</option>
+                            <option value="1hour"  >1 hour</option>
+                            <option value="2hour">2 hour</option>
+                            <option value="4hour">4 hour</option>
+                            <option value="1day">1 daily</option>
+                            <option value="0" selected="selected" >Stop</option>
+                        </select>
+                        <span class="help-block">Pick a schedule</span>  
+                        </div>
+                    </div>';
         } else {
             echo '
-<!-- Select Basic -->
-<div class="form-group">
-<label class="col-md-4 control-label" for="selectbasic">Cron schedule</label>
-<div class="col-md-4">
-<select id="selectbasic" name="Cron" class="form-control">';
-            if ($Cron == "15min") {
-                echo '     <option value="15min" selected="selected" >15 min</option>';
-            } else {
-                echo '     <option value="15min">15 min</option>';
-            }
-            if ($Cron == "30min") {
-                echo '  <option value="30min" selected="selected">30 min</option>';
-            } else {
-                echo '  <option value="30min">30 min</option>';
-            }
-            if ($Cron == "1hour") {
-                echo '    <option value="1hour" selected="selected"  >1 hour</option>';
-            } else {
-                echo ' <option value="1hour">1 hour</option>';
-            }
-            if ($Cron == "2hour") {
-                echo '     <option value="2hour" selected="selected" >2 hour</option>';
-            } else {
-                echo '  <option value="2hour">2 hour</option>';
-            }
-            if ($Cron == "4hour") {
-                echo '  <option value="4hour" selected="selected"  >4 hour</option>';
-            } else {
-                echo '<option value="4hour">4 hour</option>';
-            }
-            if ($Cron == "1day") {
-                echo '    <option value="1day" selected="selected"  >1 daily</option>';
-            } else {
-                echo '  <option value="1day">1 daily</option>';
-            }
-            if ($Cron == "0") {
-                echo '    <option value="0" selected="selected"  >Stop</option>';
-            } else {
-                echo ' <option value="0">Stop</option>';
-            }
+                <!-- Select Basic -->
+                <div class="form-group">
+                    <label class="col-md-4 control-label" for="selectbasic">Cron schedule</label>
+                <div class="col-md-4">
+                <select id="selectbasic" name="Cron" class="form-control">';
+
+
+                if ($Cron == "15min") {
+                    echo '     <option value="15min" selected="selected" >15 min</option>';
+                } else {
+                    echo '     <option value="15min">15 min</option>';
+                }
+                if ($Cron == "30min") {
+                    echo '  <option value="30min" selected="selected">30 min</option>';
+                } else {
+                    echo '  <option value="30min">30 min</option>';
+                }
+                if ($Cron == "1hour") {
+                    echo '    <option value="1hour" selected="selected"  >1 hour</option>';
+                } else {
+                    echo ' <option value="1hour">1 hour</option>';
+                }
+                if ($Cron == "2hour") {
+                    echo '     <option value="2hour" selected="selected" >2 hour</option>';
+                } else {
+                    echo '  <option value="2hour">2 hour</option>';
+                }
+                if ($Cron == "4hour") {
+                    echo '  <option value="4hour" selected="selected"  >4 hour</option>';
+                } else {
+                    echo '<option value="4hour">4 hour</option>';
+                }
+                if ($Cron == "1day") {
+                    echo '    <option value="1day" selected="selected"  >1 daily</option>';
+                } else {
+                    echo '  <option value="1day">1 daily</option>';
+                }
+                if ($Cron == "0") {
+                    echo '    <option value="0" selected="selected"  >Stop</option>';
+                } else {
+                    echo ' <option value="0">Stop</option>';
+                }
             echo '
-</select>
-<span class="help-block">Pick a schedule</span>  
-</div>
-</div>';
+                </select>
+                <span class="help-block">Pick a schedule</span>  
+                </div>
+                </div>';
         }
         global $wpdb;
         $table_name_ecs = $wpdb->prefix . 'ecs';
@@ -179,23 +191,24 @@ class ecsProductSettings {
         if (count($statesmeta) > 0) {
             foreach ($statesmeta as $k) {
                 echo '<!-- Text input-->
-<div class="form-group">
-<label class="col-md-4 control-label " for="textinput" style="cursor:default"> Last Processed File</label>  
-<div class="col-md-4">
-<label class="col-md-4 control-label " for="textinput" style="cursor:default; padding-left:0px ; margin-left:0px ;" >' . $k->type . ' </label>  
-<span class="help-block"></span>  
-</div>
-</div>';
+                        <div class="form-group">
+                        <label class="col-md-4 control-label " for="textinput" style="cursor:default"> Last Processed File</label>  
+                        <div class="col-md-4">
+                        <label class="col-md-4 control-label " for="textinput" style="cursor:default; padding-left:0px ; margin-left:0px ;" >' . $k->type . ' </label>  
+                        <span class="help-block"></span>  
+                        </div>
+                        </div>';
             }
-        } else {
+        } 
+        else {
             echo '<!-- Text input-->
-<div class="form-group">
-<label class="col-md-4 control-label" for="textinput" style="cursor:default"> Last Processed File</label>  
-<div class="col-md-4">
-<label class="col-md-4 control-label" for="textinput" style="cursor:default"> </label>  
-<span class="help-block"></span>  
-</div>
-</div>';
+                <div class="form-group">
+                <label class="col-md-4 control-label" for="textinput" style="cursor:default"> Last Processed File</label>  
+                <div class="col-md-4">
+                <label class="col-md-4 control-label" for="textinput" style="cursor:default"> </label>  
+                <span class="help-block"></span>  
+                </div>
+                </div>';
         }
 		
 	

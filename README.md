@@ -10,6 +10,7 @@ Release 2.0.0.1 - 01-07-2020
 - Used product title in Product export and not url
 - Fixed issue in Stock import.
 - Moved plugin under woocommerce menu
+- Compatibility with PostNL Age check option if selected 
 
 
 Release 1.9.2.4 - 18-05-2019

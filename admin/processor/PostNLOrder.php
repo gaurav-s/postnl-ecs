@@ -523,7 +523,13 @@ class PostNLOrder extends PostNLProcess
                     } else { //From PostNL-WooCommerce Plugin
                             $order_shipping_method_id = $shippingCodePostNL;
                     }
-                        
+                    
+                    //Add Age Check option for NL
+                    $ageCheckoption = postnl_fulfilment_shipping_age_check($order->get_shipping_country(), $order);
+                    
+                    if(!empty($ageCheckoption) && strtolower($order->get_shipping_country()) === 'nl' )
+                        $order_shipping_method_id = $ageCheckoption;
+
                     $node->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','shippingAgentCode', $order_shipping_method_id));
                         
                     $node->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','shipmentType', ''));

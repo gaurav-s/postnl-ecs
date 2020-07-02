@@ -80,14 +80,12 @@
 				
 				}
 				
-				orderfunction12();
-				$obj = new ni_order_list();
-				$obj->inventoryImport();
+				$postnlStock = new PostNLStock();
+				$postnlStock->processStock();
 			if ($Cron == '0') {
 						postnlecs_stop_cron_inventory();
 				} else {
-					  $obj =  new ni_order_list();
-					 						$obj->inventoryImport();
+					  
 					wp_clear_scheduled_hook('task_inventory_import');
 					if (!wp_next_scheduled('task_inventory_import')) {
 							wp_schedule_event(time(), $Cron, 'task_inventory_import');

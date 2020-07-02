@@ -161,3 +161,18 @@
             return '04945';
 
     }
+
+    function postnl_fulfilment_shipping_age_check ($shippingCountry, $order) {
+        $shippingOptions = $order->get_meta('_postnl_shipment_options');
+        $ageCheck = '';
+        $ageCheckCode = 'LC1';
+        
+        if($shippingOptions) {
+            
+            if(isset($shippingOptions['age_check']) && ($shippingOptions['age_check'] != 0))
+                $ageCheck =  $ageCheckCode;
+
+        } 
+        
+        return  $ageCheck;
+    }

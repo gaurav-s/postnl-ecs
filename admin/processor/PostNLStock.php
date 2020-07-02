@@ -9,11 +9,9 @@ class PostNLStock extends PostNLProcess
 
     public function processStock(){
 
-        $EcsSftpSettings = $this->getFtpSettings();
-        $sftp = $this->checkFtpSettings($Path);
+       
 
-        if(!$sftp) 
-            return false;
+       
 
         $EcsInventorySettings = ecsInventorySettings::init();
         $Path = '';
@@ -41,11 +39,18 @@ class PostNLStock extends PostNLProcess
 				
 				
         }
+        $EcsSftpSettings = $this->getFtpSettings();
+        $sftp = $this->checkFtpSettings($Path);
         
         if(empty($Path)) {
             error_log('POSTNL: Stock Import Path Settings not found'); 
             return false;
         }
+
+        if(!$sftp) 
+            return false;
+        
+        
             
         
         $sftp->chdir($Path); // open directory 'test'
@@ -120,6 +125,15 @@ class PostNLStock extends PostNLProcess
                                     </html>';
                                     
                                 $this->sendErrorEmail($Errors);
+                                $sftp->chdir($Path.'/tmp');
+                                if($sftp->pwd() !== $Path.'/tmp') {
+                                    wp_die('check');
+                                    $sftp->mkdir($Path.'/tmp');
+                                    
+                                }
+
+                                $sftp->chdir($Path);
+                                $sftp->rename($sftp->pwd() . '/' . $filename,$sftp->pwd() . '/tmp/' . $filename);
                         }
                         
                         else {

@@ -82,7 +82,7 @@ function postnlecs_display_adminUI() {
 add_filter('manage_edit-shop_order_columns', 'postnlecs_shop_order_column', 11);
 	
 function postnlecs_shop_order_column($columns) {
-		$columns['my-column1'] = __('Export Status', 'theme_slug');
+		$columns['postnlecs-export'] = __('Export Status', 'theme_slug');
 		return $columns;
 }
 
@@ -92,10 +92,13 @@ add_action('manage_shop_order_posts_custom_column', 'postnlecs_add_exportedColum
 	
 function postnlecs_add_exportedColumn($column) {
     
-    global $post, $woocommerce, $the_order;
+	global $post, $woocommerce, $the_order;
+	if(!$the_order)
+		return;
+
     $order_id = $the_order->get_id();
     switch ($column) {
-        case 'my-column1':
+        case 'postnlecs-export':
             $isExported = get_post_meta($order_id, 'ecsExport', true);
             if (strlen($isExported) !== 0) {
                 echo ' EXPORTED ';

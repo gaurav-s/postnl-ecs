@@ -46,7 +46,7 @@ class PostNLProcess
 
     }
 
-    public function sendErrorEmail($mailBody)
+    public function sendErrorEmail($mailBody, $type)
     {
         global $wpdb;
 		$name = '';
@@ -82,7 +82,8 @@ class PostNLProcess
 					
 						
 		$to = $email;
-		$subject = 'PostNL ECS plugin processing error';
+		$subject = 'PostNL Fulfilment plugin: '.$type.' processing error for webshop '.get_bloginfo();
+		
 		$body = $mailBody;
 		$headers = array(
 						'Content-Type: text/html; charset=UTF-8'
@@ -105,7 +106,14 @@ class PostNLProcess
         return false;
 
 
-    }
+	}
+	
+	public function formatnumber($number) {
+
+		$numConverted = round((float) $number,2);
+
+        return number_format( $numConverted,2,'.','');
+	}
 
 
 }

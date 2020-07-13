@@ -1,9 +1,9 @@
 <?php
 	/* 
-	Plugin Name: PostNL-Fulfilment
+	Plugin Name: WooCommerce PostNL-Fulfilment
 	Plugin URI: http://www.postnl.nl/
-	Description: PostNL Fulfilment Plugin
-	Version: 1.9.2.4
+	Description: PostNL Fulfilment plugin for WooCommerce
+	Version: 2.0.0.2
 	Author: PostNL 
 	Author URI: http://www.postnl.nl/
 	*/
@@ -50,7 +50,7 @@
 
 	
 	global $jal_db_version;
-	$jal_db_version = '2.0.0.1';
+	$jal_db_version = '2.0.0.2';
 	function postnlecs_plugin_install() {
 		global $wpdb;
 		$table_name = $wpdb->prefix . 'ecs';

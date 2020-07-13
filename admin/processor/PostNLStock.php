@@ -64,11 +64,14 @@ class PostNLStock extends PostNLProcess
                     continue;
                 } 
                 
-                else { 
+                
                     
-                    $sftp->get($sftp->pwd() . '/' . $filename, ECS_DATA_PATH."/".$filename);
-                    if (file_exists(ECS_DATA_PATH."/".$filename) && filesize(ECS_DATA_PATH."/".$filename) > 0) {
-                        $xml = simplexml_load_file(ECS_DATA_PATH."/".$filename, 'SimpleXMLElement', LIBXML_NOWARNING);
+                    //$sftp->get($sftp->pwd() . '/' . $filename, ECS_DATA_PATH."/".$filename);
+                    //if (file_exists(ECS_DATA_PATH."/".$filename) && filesize(ECS_DATA_PATH."/".$filename) > 0) {
+                        //$xml = simplexml_load_file(ECS_DATA_PATH."/".$filename, 'SimpleXMLElement', LIBXML_NOWARNING);
+                        $stockFileData = $sftp->get($sftp->pwd() . '/' . $filename);							
+                        if($stockFileData) {
+                          $xml = simplexml_load_string($stockFileData, 'SimpleXMLElement', LIBXML_NOWARNING);
                         
                         $inventory_errors = array();
                         
@@ -124,7 +127,7 @@ class PostNLStock extends PostNLProcess
                                 $Errors .= '</p></body>
                                     </html>';
                                     
-                                $this->sendErrorEmail($Errors);
+                                $this->sendErrorEmail($Errors,'Stock');
                                 $sftp->chdir($Path.'/tmp');
                                 if($sftp->pwd() !== $Path.'/tmp') {
                                     wp_die('check');
@@ -143,7 +146,7 @@ class PostNLStock extends PostNLProcess
                             
                         if(file_exists(ECS_DATA_PATH."/".$filename))
                                 unlink(ECS_DATA_PATH."/".$filename);
-                    }
+                    
                 }
             }
         }

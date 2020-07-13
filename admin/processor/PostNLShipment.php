@@ -76,9 +76,12 @@ class PostNLShipment extends PostNLProcess
                    continue;
                 
                     
-                $sftp->get($sftp->pwd() . '/' . $filename,ECS_DATA_PATH."/".$filename);							
-                if(file_exists(ECS_DATA_PATH."/".$filename) && filesize(ECS_DATA_PATH."/".$filename) > 0) {
-                    $xml = simplexml_load_file(ECS_DATA_PATH."/".$filename, 'SimpleXMLElement', LIBXML_NOWARNING);
+                //$sftp->get($sftp->pwd() . '/' . $filename,ECS_DATA_PATH."/".$filename);							
+                //if(file_exists(ECS_DATA_PATH."/".$filename) && filesize(ECS_DATA_PATH."/".$filename) > 0) {
+                  //  $xml = simplexml_load_file(ECS_DATA_PATH."/".$filename, 'SimpleXMLElement', LIBXML_NOWARNING);
+                  $shipmentFileData = $sftp->get($sftp->pwd() . '/' . $filename);							
+                  if($shipmentFileData) {
+                    $xml = simplexml_load_string($shipmentFileData, 'SimpleXMLElement', LIBXML_NOWARNING);
                          
                     $deleteFile = false;
                     $validate = true; 
@@ -287,7 +290,7 @@ class PostNLShipment extends PostNLProcess
                         $Errors .= '</p></body>
                                 </html>';
                                 
-                        $this->sendErrorEmail($Errors);
+                        $this->sendErrorEmail($Errors,'Shipment');
 
                     }
                     

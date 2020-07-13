@@ -597,12 +597,12 @@ class PostNLOrder extends PostNLProcess
                             
                         $orderItemNameClean = str_replace($this->_getBadCharacters(), '', $orderItemName);
                                 
-                        
+                       
                         $line = $xml->createElementNS('http://www.toppak.nl/deliveryorder_new','deliveryOrderLine');
                         $line->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','itemNo', $productSKU));
                         $line->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','itemDescription', $orderItemNameClean));
                         $line->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','quantity', $item['qty']));
-                        $line->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','singlePriceInclTax', round((float) $item['line_subtotal'],2)));
+                        $line->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','singlePriceInclTax', $this->formatnumber($item['line_subtotal'])));
                         
                         $node2->appendChild($line);
                         
@@ -771,7 +771,7 @@ class PostNLOrder extends PostNLProcess
             $Errors .= '</p></body>
                 </html>';
                     
-            $this->sendErrorEmail($Errors);
+            $this->sendErrorEmail($Errors,'Order');
         } 
 
     }

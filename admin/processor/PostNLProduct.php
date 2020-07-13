@@ -301,13 +301,13 @@ class PostNLProduct extends PostNLProcess
 				$node->appendChild($xml->createElementNS("http://www.toppak.nl/item",'sortOrder', $sortOrder));
 				$node->appendChild($xml->createElementNS("http://www.toppak.nl/item",'minStock', $minStock));
 				$node->appendChild($xml->createElementNS("http://www.toppak.nl/item",'maxStock', $maxStock));
-				$node->appendChild($xml->createElementNS("http://www.toppak.nl/item",'retailPrice', round((float) $product->get_regular_price(),2)));
+				$node->appendChild($xml->createElementNS("http://www.toppak.nl/item",'retailPrice', $this->formatnumber($product->get_regular_price())));
                         
                 //PURCHASE PRICE
                 if(strlen($product->get_sale_price()) == 0) {
-					$node->appendChild($xml->createElementNS("http://www.toppak.nl/item",'purchasePrice', round((float) $product->get_regular_price(),2)));
+					$node->appendChild($xml->createElementNS("http://www.toppak.nl/item",'purchasePrice', $this->formatnumber($product->get_regular_price())));
 				} else {
-					$node->appendChild($xml->createElementNS("http://www.toppak.nl/item",'purchasePrice', round((float) $product->get_sale_price(),2)));
+					$node->appendChild($xml->createElementNS("http://www.toppak.nl/item",'purchasePrice', $this->formatnumber($product->get_sale_price())));
 				}
                         
                 //PRODUCT TYPE
@@ -469,7 +469,7 @@ class PostNLProduct extends PostNLProcess
                 $Errors .= '</p></body>
 						</html>';
                     
-                $this->sendErrorEmail($Errors);
+                $this->sendErrorEmail($Errors,'Product');
 
 					
 

@@ -116,3 +116,29 @@ function postnlecs_stop_cron_shipment() {
     wp_clear_scheduled_hook('task_shipment_import');
 }
 
+function postnlecs_cron_selection_display($Cron) {
+    
+    
+    
+        
+    echo '
+<!-- Select Basic -->
+<div class="form-group">
+<label class="col-md-4 control-label" for="selectbasic">Cron schedule</label>
+<div class="col-md-4">
+<select id="selectbasic" name="Cron" class="form-control">';
+echo '<option value="15min" '. ($Cron === "15min" ? 'selected' : '' ).' >15 min</option>';
+echo '<option value="30min" '. ($Cron === "30min" ? 'selected' : '' ).' >30 min</option>';
+echo '<option value="1hour" '. ($Cron === "1hour" ? 'selected' : '' ).' >1 hour</option>';
+echo '<option value="2hour" '. ($Cron === "2hour" ? 'selected' : '' ).' >2 hour</option>';
+echo '<option value="4hour" '. ($Cron === "4hour" ? 'selected' : '' ).' >4 hour</option>';
+echo '<option value="1day" '. ($Cron === "1day" ? 'selected' : '' ).' >1 daily</option>';
+echo '<option value="0" '. (!$Cron  ? 'selected' : '' ).' >Stop</option>';
+echo '
+</select>
+<span class="help-block">Pick a schedule</span>  
+</div>
+</div>';
+    
+}
+

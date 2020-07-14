@@ -342,15 +342,16 @@ class PostNLOrder extends PostNLProcess
 
                     
                     //SHIPPING PHONE 
-                    $billingPhone = 1;   
+                    $billingPhone = $order->get_billing_phone() ? $order->get_billing_phone() : '1';
 
-                    if(strlen($order->get_billing_phone()) > 15) {
+                    
+
+                    if(strlen($billingPhone) > 15) {
                         $failed->addError(" shipping_phone length is greater than 15 characters");
                         $isvalidate = false;
-                    } else {
-                        $billingPhone = $order->get_billing_phone();   
-                    }
+                    } 
 
+                    
                     
                         
                     $node->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','shipToPhone', $billingPhone));

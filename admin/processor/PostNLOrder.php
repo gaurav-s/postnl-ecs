@@ -212,7 +212,7 @@ class PostNLOrder extends PostNLProcess
                     $orderShipPostDeliveryTime = '';
 
                     //For PGE address
-                    $shippingCodeArrayskip = ['04944','04945', 'NA'];
+                    $shippingCodeArrayskip = ['04952','04945', 'NA'];
                         
                     if($shippingCodePostNL && !in_array($shippingCodePostNL, $shippingCodeArrayskip)) {
                         $shippingOptions = $order->get_meta('_postnl_delivery_options');

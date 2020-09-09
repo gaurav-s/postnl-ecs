@@ -156,7 +156,7 @@
 
     function get_outside_nl_shipping($countryCode) {
         if(ecs_eu_country_check(strtoupper($countryCode)))
-            return '04944'; 
+            return '04952'; 
         else 
             return '04945';
 

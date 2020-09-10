@@ -3,7 +3,7 @@
 	Plugin Name: WooCommerce PostNL-Fulfilment
 	Plugin URI: http://www.postnl.nl/
 	Description: PostNL Fulfilment plugin for WooCommerce
-	Version: 2.0.0.3
+	Version: 2.0.0.4
 	Author: PostNL 
 	Author URI: http://www.postnl.nl/
 	*/
@@ -50,7 +50,7 @@
 
 	
 	global $jal_db_version;
-	$jal_db_version = '2.0.0.3';
+	$jal_db_version = '2.0.0.4';
 	function postnlecs_plugin_install() {
 		global $wpdb;
 		$table_name = $wpdb->prefix . 'ecs';

@@ -149,7 +149,7 @@
     }
 
      function ecs_eu_country_check($country_code) {
-        $euro_countries = array('AT','BE','BG','CZ','DK','EE','FI','FR','DE','GB','GR','HU','IE','IT','LV','LT','LU','PL','PT','RO','SK','SI','ES','SE','MC','AL','AD','BA','IC','FO','GI','GL','GG','JE','HR','LI','MK','MD','ME','UA','SM','RS','VA','BY','CY','MT');
+        $euro_countries = array('AT','BE','BG','CZ','DK','EE','FI','FR','DE','GR','HU','IE','IT','LV','LT','LU','PL','PT','RO','SK','SI','ES','SE','MC','AL','AD','BA','IC','FO','GI','GL','GG','JE','HR','LI','MK','MD','ME','UA','SM','RS','VA','BY','CY','MT');
 
         return in_array( $country_code, $euro_countries);
     }

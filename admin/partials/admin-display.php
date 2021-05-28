@@ -112,9 +112,9 @@ function postnlecs_add_exportedColumn($column) {
 
 //Custom Fields
 
-add_action('woocommerce_admin_order_data_after_shipping_address', 'my_custom_checkout_field_display_admin_order_meta', 10, 1);
-	
-function my_custom_checkout_field_display_admin_order_meta($order) {
+add_action('woocommerce_admin_order_data_after_shipping_address', 'postnlecs_checkout_field_display_admin_order_meta', 10, 1);
+
+function postnlecs_checkout_field_display_admin_order_meta($order) {
 		$trackcode  = get_post_meta($order->get_id(), 'trackAndTraceCode', true);
 		$isExported = get_post_meta($order->get_id(), 'ecsExport', true);
 		

@@ -1,9 +1,9 @@
 # postnl-ecs
 Integrator plugin for PostNL ECS
-Release 2.0.0.6 - 28-05-2020
+Release 2.0.0.6 - 28-05-2021
 - Fix issue of function name.
 
-Release 2.0.0.5 - 02-02-2020
+Release 2.0.0.5 - 02-02-2021
 - BREXIT changes.
 Release 2.0.0.4 - 09-09-2020
 - Changed shipping code for EU.

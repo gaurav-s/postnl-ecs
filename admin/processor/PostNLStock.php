@@ -98,9 +98,12 @@ class PostNLStock extends PostNLProcess
                             } else {
                                 
                                     foreach($Products as $product) {
+
                                         $product_id = $product->ID;
-                                    
-                                        update_post_meta((int) $product_id, '_stock', (int) $stock->stockdtl_fysstock);
+                                        $wcProduct =  wc_get_product($product_id);
+                                        //update_post_meta((int) $product_id, '_stock', (int) $stock->stockdtl_fysstock);
+                                        wc_update_product_stock($wcProduct,(int) $stock->stockdtl_fysstock,'set');
+                                        wc_delete_product_transients( $product_id );
                                     }
                                 
                                 

@@ -215,23 +215,30 @@ class PostNLOrder extends PostNLProcess
                     $shippingCodeArrayskip = ['04952','04945', 'NA'];
 
                     if($shippingCodePostNL && !in_array($shippingCodePostNL, $shippingCodeArrayskip)) {
-                        $shippingOptions = $order->get_meta('_postnl_delivery_options');
+                        $shippingOptionsJson = $order->get_meta('_postnl_delivery_options');
+                        $shippingOptions = json_decode($shippingOptionsJson,true);
                         if($shippingCodePostNL === 'PGE' || $shippingCodePostNL === '03533') {
 
-                            if(
-                                isset($shippingOptions['postal_code'])
-                                && isset($shippingOptions['street'])
-                                && 	isset($shippingOptions['number'])
-                                && isset($shippingOptions['city'])
-                            ) {
+                            if(isset($shippingOptions['pickupLocation'])) {
 
-                                $orderShipPostCode = $shippingOptions['postal_code']; //Set for PGE
-                                $orderShipPostcity = $shippingOptions['city']; //Set Set for PGE
-                                $orderShipPostcountry = isset($shippingOptions['cc']) ? $shippingOptions['cc'] : $orderShipPostcountry ; //Set for PGE
-                                $orderShipPoststreet =  $shippingOptions['street']; //Set for PGE
-                                $orderShipPoststreetNum = $shippingOptions['number']; //Set for PGE
-                                $orderShipPostcompany = isset($shippingOptions['location']) ? $shippingOptions['location'] : $orderShipPostcompany;
+                                $pickupOptions = $shippingOptions['pickupLocation'];
+                                if(
+
+                                    isset($pickupOptions['postal_code'])
+                                    && isset($pickupOptions['street'])
+                                    && 	isset($pickupOptions['number'])
+                                    && isset($pickupOptions['city'])
+                                ) {
+
+                                    $orderShipPostCode = $pickupOptions['postal_code']; //Set for PGE
+                                    $orderShipPostcity = $pickupOptions['city']; //Set Set for PGE
+                                    $orderShipPostcountry = isset($pickupOptions['cc']) ? $pickupOptions['cc'] : $orderShipPostcountry ; //Set for PGE
+                                    $orderShipPoststreet =  $pickupOptions['street']; //Set for PGE
+                                    $orderShipPoststreetNum = $pickupOptions['number']; //Set for PGE
+                                    $orderShipPostcompany = isset($pickupOptions['location_name']) ? $pickupOptions['location_name'] : $orderShipPostcompany;
+                                }
                             }
+
 
 
                         } else {
@@ -241,13 +248,18 @@ class PostNLOrder extends PostNLProcess
 
                                 $postNLdeliveryDate = strtotime($shippingOptions['date']);
 
-                                if($postNLdeliveryDate > strtotime('tomorrow'))
+                                if($postNLdeliveryDate > strtotime('tomorrow')) {
                                     $orderShipPostDeliveryDate = date('Y-m-d',$postNLdeliveryDate);
+                                    $orderShipPostDeliveryTime  = date('H:i', $postNLdeliveryDate);
+                                }
+
+
+
 
                             }
 
 
-                            if($orderShipPostDeliveryDate && isset($shippingOptions['time'])) {
+                            /*if($orderShipPostDeliveryDate && isset($shippingOptions['time'])) {
 
                                 foreach($shippingOptions['time'] as $timeOption) {
                                     if(isset($timeOption['start'])) {
@@ -259,7 +271,7 @@ class PostNLOrder extends PostNLProcess
                                 }
 
 
-                            }
+                            }*/
 
                         }
 
@@ -290,7 +302,7 @@ class PostNLOrder extends PostNLProcess
 
 
 
-                    //SHIP TO POSTAL CODE    
+                    //SHIP TO POSTAL CODE
                     if(strlen($orderShipPostCode) == 0) {
                         $failed->addError(" shipToPostalCode length is null");
                         $isvalidate = false;
@@ -341,9 +353,11 @@ class PostNLOrder extends PostNLProcess
                         $node->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','shipToCountry', ''));
 
 
-                    //SHIPPING PHONE 
+                    //SHIPPING PHONE
                     $billingPhoneOr = $order->get_billing_phone() ? $order->get_billing_phone() : '1';
                     $billingPhone = preg_replace("/\s+/", "", $billingPhoneOr);
+
+
 
 
                     if(strlen($billingPhone) > 15) {

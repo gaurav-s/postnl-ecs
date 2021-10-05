@@ -1,6 +1,9 @@
 # postnl-ecs
 Integrator plugin for PostNL ECS
 
+Release 2.0.2 - 05-10-2021
+- Compatibility with PostNL Plugin Ver 4.3.3.
+
 Release 2.0.1 - 15-07-2021
 - Fix issue in setting product stock status once product is in Stock.
 Release 2.0.0.6 - 28-05-2021

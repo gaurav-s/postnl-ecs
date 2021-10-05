@@ -50,7 +50,7 @@
 
 	
 	global $jal_db_version;
-	$jal_db_version = '2.0.1';
+	$jal_db_version = '2.0.2';
 	function postnlecs_plugin_install() {
 		global $wpdb;
 		$table_name = $wpdb->prefix . 'ecs';

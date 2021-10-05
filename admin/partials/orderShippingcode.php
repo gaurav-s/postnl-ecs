@@ -14,6 +14,10 @@ Author URI: http://www.postnl.nl/
 function getPostNLEcsShippingCode($shippingCountry, $order) {
 
     $shippingOptionsJson = $order->get_meta('_postnl_delivery_options');
+
+    if(is_array($shippingOptionsJson))
+        return false;
+
     $shippingOptions = json_decode($shippingOptionsJson,true);
 
     $saoArray = [
@@ -55,7 +59,7 @@ function getPostNLEcsShippingCode($shippingCountry, $order) {
 
             }
 
-            if($shippingOptions['packageType'] == 'letter' || $shippingOptions['digital_stamp'])
+            if($shippingOptions['packageType'] == 'letter' || $shippingOptions['packageType'] == 'digital_stamp')
                 return 'NA';
 
 
@@ -138,6 +142,8 @@ function get_outside_nl_shipping($countryCode) {
 
 function postnl_fulfilment_shipping_age_check ($shippingCountry, $order) {
     $shippingOptionsJson = $order->get_meta('_postnl_delivery_options');
+    if(is_array($shippingOptionsJson))
+        return '';
 
     $shippingOptions = json_decode($shippingOptionsJson,true);
     $ageCheck = '';

@@ -216,7 +216,9 @@ class PostNLOrder extends PostNLProcess
 
                     if($shippingCodePostNL && !in_array($shippingCodePostNL, $shippingCodeArrayskip)) {
                         $shippingOptionsJson = $order->get_meta('_postnl_delivery_options');
-                        $shippingOptions = json_decode($shippingOptionsJson,true);
+
+                        $shippingOptions = is_array($shippingOptionsJson) ? '' : json_decode($shippingOptionsJson,true) ;
+
                         if($shippingCodePostNL === 'PGE' || $shippingCodePostNL === '03533') {
 
                             if(isset($shippingOptions['pickupLocation'])) {

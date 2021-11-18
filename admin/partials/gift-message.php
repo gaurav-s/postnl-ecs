@@ -25,6 +25,8 @@ function woocommerce_postnl_fulfillment_add_card_text_field() {
 
             if ($k->keytext == "giftcard_attribute") {
                 $giftMessageAttribute = trim($k->value);
+                $giftMessageAttribute = strtolower($giftMessageAttribute);
+                $giftMessageAttribute = preg_replace('/\s+/', '-', $giftMessageAttribute);
             }
             if ($k->keytext == "giftcard_attribute_value") {
                 $giftMessageAttributeValue = trim($k->value);
@@ -47,14 +49,18 @@ function woocommerce_postnl_fulfillment_add_card_text_field() {
             return;
 
 
-        if(isset($_REQUEST['card-text-message']))
-            $message = $_REQUEST['card-text-message'];
+        if(isset($_REQUEST['card-text-message'])) {
+            if(!isset($_REQUEST['add-to-cart']))
+                $message = $_REQUEST['card-text-message'];
+
+        }
+
 
 
         echo '<table class="variations postnlecs-card" style="display:none;" cellspacing="0">
                     <tbody>
                         <tr>
-                        <td class="label"><label for="postnl-fulfilment-card"> '. __("Message for the card",'woocommerce-postnlfulfillment').'</label></td>
+                        <td class="label"><label for="postnl-fulfilment-card"> '. __("Message for the card",'woocommercepostnlfulfillment').'</label></td>
                         <td class="value">
                              <input id="postnl-fulfilment-card" type="text" name="card-text-message" style="width:100%;" value="'. $message .'" />  
                                                  
@@ -63,18 +69,18 @@ function woocommerce_postnl_fulfillment_add_card_text_field() {
                     </tbody>
                 </table>';
 
-        echo '<script> 
+        echo '<script type="text/javascript"> 
                     var cardattributevalue = "'.$giftMessageAttributeValue.'";
                     var cardattribute = "'.$giftMessageAttribute.'";
                     jQuery(function() {
                         jQuery( ".variations_form" ).on( "show_variation", function (event,variations) {
-                            console.log(this);
+                            
                             postnlcheckcardattribute();
                         });
                     });
                     
                     function postnlcheckcardattribute(){
-                        console.log("print");
+                        
                         var cardatt = jQuery(".variations #"+cardattribute).val();
                         if(cardatt == cardattributevalue) {
                             jQuery(".postnlecs-card").show();
@@ -117,7 +123,7 @@ function woocommerce_postnl_fulfillment_card_message_validation() {
     }*/
     if ( !empty( $_REQUEST['card-text-message'] ) ) {
         if(strlen($_REQUEST['card-text-message']) > 255) {
-            wc_add_notice( __( 'Card message should be less than 255 characters&hellip;', 'woocommerce-postnlfulfillment' ), 'error' );
+            wc_add_notice( __( 'Card message should be less than 255 characters', 'woocommercepostnlfulfillment' ), 'error' );
             return false;
         }
     }
@@ -152,7 +158,7 @@ function woocommerce_postnl_fulfillment_render_meta_on_cart_and_checkout( $cart_
     }
     if( isset( $cart_item['card_message_text'] ) && !empty(trim($cart_item['card_message_text']))) {
 
-        $custom_items[] = array( "name" => __('Message for the card','woocommerce-postnlfulfillment'), "value" => $cart_item['card_message_text'] );
+        $custom_items[] = array( "name" => __('Message for the card','woocommercepostnlfulfillment'), "value" => $cart_item['card_message_text'] );
     }
     return $custom_items;
 }

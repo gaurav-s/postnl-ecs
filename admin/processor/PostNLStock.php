@@ -133,7 +133,7 @@ class PostNLStock extends PostNLProcess
                                 $this->sendErrorEmail($Errors,'Stock');
                                 $sftp->chdir($Path.'/tmp');
                                 if($sftp->pwd() !== $Path.'/tmp') {
-                                    wp_die('check');
+                                    //wp_die('check');
                                     $sftp->mkdir($Path.'/tmp');
                                     
                                 }

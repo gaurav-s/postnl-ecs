@@ -1,3 +1,0 @@
-#: gift-message:57
-msgid "Message for the card"
-msgstr ""

@@ -145,7 +145,7 @@ class ecsOrderSettings {
             ';
 
         echo    '<div class="form-group">
-                <label class="col-md-4 control-label" for="giftcard_attribute_value">Attribute code value to show git card input</label>  
+                <label class="col-md-4 control-label" for="giftcard_attribute_value">Attribute code value to show gift card input</label>  
                     <div class="col-md-4">
                     <input id="textinput" name="giftcard_attribute_value" type="text" placeholder="Yes"  class="form-control input-md" value=' . $giftMessageValue . '>
                     <span class="help-block">If any custom value selected based on which selection would be displayed. Default is Yes</span>  

@@ -1,0 +1,5 @@
+#: gift-message:57
+msgid "Message for the card"
+msgstr ""
+msgid "Card message should be less than 255 characters"
+msgstr ""

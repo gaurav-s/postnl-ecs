@@ -6,7 +6,7 @@
 	Version: 2.1.0
 	Author: PostNL 
 	Author URI: http://www.postnl.nl/
-	Text Domain:       woocommerce-postnlfulfillment
+	Text Domain:       woocommercepostnlfulfillment
 	*/
 
 	/**
@@ -83,12 +83,21 @@
 	register_activation_hook(__FILE__, 'postnlecs_plugin_installMeta');
 	register_activation_hook(__FILE__, 'postnlecs_plugin_install');
 
+	/*
     load_plugin_textdomain(
-        'woocommerce-postnlfulfillment',
+        'woocommercepostnlfulfillment',
         false,
         dirname( dirname( plugin_basename( __FILE__ ) ) ) . '/languages/'
     );
+    */
+    add_action( 'plugins_loaded', 'postnl_fulfillment_load_textdomain' );
 
+    /**
+     * Load plugin textdomain.
+     */
+    function postnl_fulfillment_load_textdomain() {
+        load_plugin_textdomain( 'woocommercepostnlfulfillment', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
+    }
 
 
 

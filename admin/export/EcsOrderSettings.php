@@ -115,7 +115,7 @@ class ecsOrderSettings {
         
     }
     
-	public function displayOrderExpSettings($Cron,$Path, $Shipping, $Status, $no   ) {
+	public function displayOrderExpSettings($Cron,$Path, $Shipping, $Status, $no  , $giftMessage = '', $giftMessageValue = '' ) {
 		
 		 echo '<div class="form-group">
 <label class="col-md-4 control-label" for="textinput">Path</label>  
@@ -134,7 +134,25 @@ class ecsOrderSettings {
 </div>
 ';
 
-postnlecs_cron_selection_display($Cron);
+
+        echo    '<div class="form-group">
+                <label class="col-md-4 control-label" for="giftcard_attribute">Attribute code of Gift Card Message</label>  
+                    <div class="col-md-4">
+                    <input id="textinput" name="giftcard_attribute" type="text" placeholder="gift_message"  class="form-control input-md" value=' . $giftMessage . '>
+                    <span class="help-block">Attribute code should be used to create variation product</span>  
+                </div>
+            </div>
+            ';
+
+        echo    '<div class="form-group">
+                <label class="col-md-4 control-label" for="giftcard_attribute_value">Attribute code value to show git card input</label>  
+                    <div class="col-md-4">
+                    <input id="textinput" name="giftcard_attribute_value" type="text" placeholder="Yes"  class="form-control input-md" value=' . $giftMessageValue . '>
+                    <span class="help-block">If any custom value selected based on which selection would be displayed. Default is Yes</span>  
+                </div>
+            </div>
+            ';
+        postnlecs_cron_selection_display($Cron);
        
         $OrderStatus = $this->getOrderStatusList();
 		

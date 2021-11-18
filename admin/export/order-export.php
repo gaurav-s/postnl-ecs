@@ -23,6 +23,8 @@
         $Cron           = '';
         $Path           = '';
         $informcustomer = '';
+        $giftMessage    = '';
+        $giftMessageValue  = '';
         $cron           = '';
         $Shipping       = '';
         $Status         = '';
@@ -52,9 +54,15 @@
 				if ($k->keytext == "no") {
 					$no = $k->value;
 				}
+                if ($k->keytext == "giftcard_attribute") {
+                    $giftMessage = $k->value;
+                }
+                if ($k->keytext == "giftcard_attribute_value") {
+                    $giftMessageValue = $k->value;
+                }
 			}
 		}
-		$EcsOrderSettings->displayOrderExpSettings($Cron,$Path, $Shipping, $Status, $no);
+		$EcsOrderSettings->displayOrderExpSettings($Cron,$Path, $Shipping, $Status, $no, $giftMessage, $giftMessageValue);
        
  
     }
@@ -75,7 +83,8 @@
         
         $Path = $_POST["Path"];
         $no   = $_POST["no"];
-        
+        $giftMessage    =  $_POST["giftcard_attribute"];
+        $giftMessageValue  =  $_POST["giftcard_attribute_value"];
         
         
         
@@ -105,21 +114,37 @@
 				$EcsOrderSettings->saveSettingsValues($id,'Shipping',$Shipping);
 				$EcsOrderSettings->saveSettingsValues($id,'Path',$Path);
 				$EcsOrderSettings->saveSettingsValues($id,'Status',$Status);
-				$EcsOrderSettings->saveSettingsValues($id,'no',$no);
+				$EcsOrderSettings->saveSettingsValues($id,'giftcard_attribute',$giftMessage);
+                $EcsOrderSettings->saveSettingsValues($id,'giftcard_attribute_value',$giftMessageValue);
 				
 				}
 				else {
 				$statesmeta = $EcsOrderSettings->getSettingValues($settingID);
+                $setGiftSetting = false;
+                $setGiftSettingValue = false;
 				foreach ($statesmeta as $k) {
 							if ($k->keytext == "Cron") $EcsOrderSettings->updateSettingsValues($k->id,$Cron);
 							if ($k->keytext == "Path") $EcsOrderSettings->updateSettingsValues($k->id,$Path);
 							if ($k->keytext == "Shipping") $EcsOrderSettings->updateSettingsValues($k->id,$Shipping);
 							if ($k->keytext == "Status") $EcsOrderSettings->updateSettingsValues($k->id,$Status);
 							if ($k->keytext == "no") $EcsOrderSettings->updateSettingsValues($k->id,$no);
+
+							if ($k->keytext == "giftcard_attribute") {
+                                $EcsOrderSettings->updateSettingsValues($k->id,$giftMessage);
+                                $setGiftSetting = true;
+                            }
+                            if ($k->keytext == "giftcard_attribute_value") {
+                                $EcsOrderSettings->updateSettingsValues($k->id,$giftMessageValue);
+                                $setGiftSettingValue = true;
+                            }
 							
 							
 						}
-				
+
+				        if(!$setGiftSetting)
+                            $EcsOrderSettings->saveSettingsValues($settingID,'giftcard_attribute',$giftMessage);
+                        if(!$setGiftSettingValue)
+                            $EcsOrderSettings->saveSettingsValues($settingID,'giftcard_attribute_value',$giftMessageValue);
 				
 				}
 				
@@ -153,7 +178,7 @@
 					<?php
 				
 		}
-		$EcsOrderSettings->displayOrderExpSettings($Cron,$Path, $Shipping, $Status, $no);
+		$EcsOrderSettings->displayOrderExpSettings($Cron,$Path, $Shipping, $Status, $no, $giftMessage, $giftMessageValue);
 		
 		
         echo "<script>

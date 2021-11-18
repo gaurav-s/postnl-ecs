@@ -621,6 +621,28 @@ class PostNLOrder extends PostNLProcess
                         $line->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','quantity', $item['qty']));
                         $line->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','singlePriceInclTax', $this->formatnumber($item['line_subtotal'])));
 
+                        $giftMessage = '';
+                        $itemmeta = $item->get_meta_data();
+
+                        if(is_array($itemmeta)) {
+                            foreach ($itemmeta as $metaobject) {
+                                $itemmetadata = $metaobject->get_data();
+                                if($itemmetadata['key'] === 'card_message_text') {
+                                    $giftMessage = $itemmetadata['value'];
+
+                                    $giftMessage = str_replace($this->_getBadCharacters(), '', $giftMessage);
+                                    $giftMessage = substr($giftMessage,0,255);
+                                }
+
+
+                            }
+                        }
+
+                        if(!empty($giftMessage)){
+                            $line->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','GiftWrap', '9'));
+                            $line->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','GiftCardInstruction', $giftMessage));
+                        }
+
                         $node2->appendChild($line);
 
                         if ($isvalidate == true)

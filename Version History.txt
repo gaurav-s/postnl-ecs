@@ -1,3 +1,7 @@
+Release 2.1.0 - 18-11-2021
+- Added option for Gift Message on Products.
+- Updated Euro countries List
+
 Release 2.0.2 - 05-10-2021
 - Compatibility with PostNL Plugin Ver 4.3.3.
 

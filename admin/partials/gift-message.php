@@ -138,7 +138,7 @@ add_action( 'woocommerce_add_to_cart_validation', 'woocommerce_postnl_fulfillmen
 
 function woocommerce_postnl_fulfillment_save_card_message_field( $cart_item_data, $product_id ) {
     if( isset( $_REQUEST['card-text-message'] ) && !empty(trim($_REQUEST['card-text-message']))) {
-        $cart_item_data[ 'card_message_text' ] = $_REQUEST['card-text-message'];
+        $cart_item_data[ 'card_message_text' ] = sanitize_text_field($_REQUEST['card-text-message']);
         /* below statement make sure every add to cart action as unique line item */
         $cart_item_data['unique_key'] = md5( microtime().rand() );
     }
@@ -173,7 +173,7 @@ function woocommerce_postnlfulfillment_card_message_order_meta_handler( $item, $
 
     //error_log(print_r($order,true));
     if( isset( $values['card_message_text'] ) ) {
-        $item->update_meta_data( 'card_message_text', $values['card_message_text'] );
+        $item->update_meta_data( 'card_message_text', sanitize_text_field($values['card_message_text']) );
     }
 
 }

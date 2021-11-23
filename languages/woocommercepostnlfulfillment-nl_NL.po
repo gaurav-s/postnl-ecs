@@ -14,7 +14,7 @@ msgstr ""
 
 #: gift-message:57
 msgid "Message for the card"
-msgstr "Plijke boodscersoonhap"
+msgstr "Persoonlijke boodschap"
 
 msgid "Card message should be less than 255 characters"
-msgstr "Bericht moet minder dan 255 tekens lang zijn"
+msgstr "Je persoonlijke boodschap mag maximaal 255 tekens lang zijn"

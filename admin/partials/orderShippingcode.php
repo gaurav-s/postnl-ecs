@@ -129,7 +129,6 @@ function getpostnlMappingCodes($options, $countryCode) {
 function ecs_eu_country_check($country_code) {
     $euro_countries = array(
                             'AT',
-                            'BE',
                             'BG',
                             'CY',
                             'CZ',
@@ -162,6 +161,8 @@ function ecs_eu_country_check($country_code) {
 }
 
 function get_outside_nl_shipping($countryCode) {
+    if(strtoupper($countryCode) == 'BE')
+        return '04946';
     if(ecs_eu_country_check(strtoupper($countryCode)))
         return '04952';
     else

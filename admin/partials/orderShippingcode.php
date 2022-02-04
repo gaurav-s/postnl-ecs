@@ -97,7 +97,7 @@ function getpostnlMappingCodes($options, $countryCode) {
             if(strtolower($countryCode) === 'nl')
                 return  '03533';
             if(strtolower($countryCode) === 'be')
-                return '49436';
+                return '04936';
             else
                 return 'NA';
         }

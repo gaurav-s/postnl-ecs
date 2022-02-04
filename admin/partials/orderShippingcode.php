@@ -96,6 +96,8 @@ function getpostnlMappingCodes($options, $countryCode) {
         if(isset($options['isPickup']) && $options['deliveryType'] == 'pickup' && $options['isPickup']){
             if(strtolower($countryCode) === 'nl')
                 return  '03533';
+            if(strtolower($countryCode) === 'be')
+                return '49436';
             else
                 return 'NA';
         }

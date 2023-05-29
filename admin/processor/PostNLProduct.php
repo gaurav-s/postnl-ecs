@@ -70,7 +70,7 @@ class PostNLProduct extends PostNLProcess
             $wpdb->query($wpdb->prepare("UPDATE $table_name_ecs SET type = '".$NextorderNo."' WHERE  id= %d", $k->id));
         }
 
-        $xml = new DOMDocument('1.0');
+        $xml = new DOMDocument();
         $message = $xml->createElementNS("http://www.toppak.nl/item", 'message');
         $xml->appendChild($message);
         $message->appendChild($xml->createElementNS("http://www.toppak.nl/item",'type', 'item'));

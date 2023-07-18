@@ -13,13 +13,27 @@ Author URI: http://www.postnl.nl/
 
 function getPostNLEcsShippingCode($shippingCountry, $order) {
 
-    $shippingOptionsJson = $order->get_meta('_postnl_delivery_options');
+    $postNlDeliveryType = new PostNLWooCommerce\Order\Single;
+    $shippingOptions = $order->get_meta('_postnl_order_metadata');
+    $found_shipping_classes = find_order_shipping_classes($order);
+
+
+    if(!empty($found_shipping_classes)){
+        $shippingOptions['packageType'] = $found_shipping_classes;
+    }
+
+
+    if(isset($shippingOptions['frontend']['dropoff_points_type']) && $shippingOptions['frontend']['dropoff_points_type'] == 'Pickup') {
+        $shippingOptions['isPickup'] = true;
+    }
+
+    /*$shippingOptionsJson = $order->get_meta('_postnl_delivery_options');
 
     if(is_array($shippingOptionsJson))
         return false;
 
     $shippingOptions = json_decode($shippingOptionsJson,true);
-
+    */
     $saoArray = [
         'Morning10',
         'Morning',
@@ -64,7 +78,7 @@ function getPostNLEcsShippingCode($shippingCountry, $order) {
 
 
             if($shippingOptions['packageType'] == 'package') {
-
+                 $shippingOptions['deliveryType'] = $postNlDeliveryType->get_delivery_type( $order );
                 $postNlCode = getpostnlMappingCodes($shippingOptions, $shippingCountry);
                 if(in_array($postNlCode,$saoArray))
                     $postNlCode = $postNlCode.$sinatureOption.$homeAddressOnly;
@@ -74,6 +88,13 @@ function getPostNLEcsShippingCode($shippingCountry, $order) {
 
 
 
+        }
+        else {
+             $shippingOptions['deliveryType'] = $postNlDeliveryType->get_delivery_type( $order );
+            $postNlCode = getpostnlMappingCodes($shippingOptions, $shippingCountry);
+            if(in_array($postNlCode,$saoArray))
+                $postNlCode = $postNlCode.$sinatureOption.$homeAddressOnly;
+            return $postNlCode;
         }
 
 
@@ -89,11 +110,8 @@ function getPostNLEcsShippingCode($shippingCountry, $order) {
 }
 
 function getpostnlMappingCodes($options, $countryCode) {
-
-
-
     if(isset($options['deliveryType'])) {
-        if(isset($options['isPickup']) && $options['deliveryType'] == 'pickup' && $options['isPickup']){
+        if(isset($options['isPickup']) && $options['deliveryType'] == 'Pickup at PostNL Point' && $options['isPickup']){
             if(strtolower($countryCode) === 'nl')
                 return  '03533';
             if(strtolower($countryCode) === 'be')
@@ -102,30 +120,20 @@ function getpostnlMappingCodes($options, $countryCode) {
                 return 'NA';
         }
 
-
-
-        if($options['deliveryType'] == 'morning')
+        if($options['deliveryType'] == 'Morning Delivery')
             return 'Morning';
 
         if(strtolower($countryCode) !== 'nl')
             return get_outside_nl_shipping($countryCode);
 
-        if($options['deliveryType'] == 'evening')
+        if($options['deliveryType'] == 'Evening Delivery')
             return 'Evening';
 
-        if($options['deliveryType'] == 'standard')
+        if($options['deliveryType'] == 'Standard Shipment')
             return 'Standard';
-
-
-
-
     }
 
     return 'PNLP';
-
-
-
-
 }
 
 function ecs_eu_country_check($country_code) {
@@ -190,4 +198,17 @@ function postnl_fulfilment_shipping_age_check ($shippingCountry, $order) {
     }
 
     return  $ageCheck;
+}
+
+function find_order_shipping_classes($order) {
+    $found_shipping_classes = array();
+    $order_items = $order->get_items();
+    foreach ( $order_items as $item_id => $item ) {
+        $product = wc_get_product($item['product_id']);
+        if ($product && $product->needs_shipping()) {
+            return $found_class = $product->get_shipping_class();
+        }
+    }
+
+    return $found_shipping_classes;
 }

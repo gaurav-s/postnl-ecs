@@ -16,7 +16,7 @@ class PostNLOrder extends PostNLProcess
         $Path = '';
         $orderStatus = '';
         $shipment = '';
-        $no = '';
+        $no = 1;
 
         $settingID = $EcsOrderSettings->getSettingId();
         if($settingID) {
@@ -34,7 +34,7 @@ class PostNLOrder extends PostNLProcess
             }
 
             if ($k->keytext == "no") {
-                $no = $k->value;
+                $no = (int) $k->value;
             }
 
             if($k->keytext == "Cron") {
@@ -166,8 +166,8 @@ class PostNLOrder extends PostNLProcess
 					$nameRetailer =  strtoupper($retailerDetails['retailer']);
 
 //                  $node->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','orderNo', $order->get_id()));
-                    $node->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','orderNo', ($nameRetailer) . ($order->get_id())));                        
-                        
+                    $node->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','orderNo', ($nameRetailer) . ($order->get_id())));
+
                     $node->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','webOrderNo', $order->get_id()));
 
 
@@ -219,51 +219,45 @@ class PostNLOrder extends PostNLProcess
                     $shippingCodeArrayskip = ['04952','04945', '04946','NA'];
 
                     if($shippingCodePostNL && !in_array($shippingCodePostNL, $shippingCodeArrayskip)) {
-                        $shippingOptionsJson = $order->get_meta('_postnl_delivery_options');
+                        $shippingOptionsJson = $order->get_meta('_postnl_order_metadata');
 
-                        $shippingOptions = is_array($shippingOptionsJson) ? '' : json_decode($shippingOptionsJson,true) ;
+                        $shippingOptions = is_array($shippingOptionsJson) ? $shippingOptionsJson : json_decode($shippingOptionsJson,true) ;
 
                         if($shippingCodePostNL === 'PGE' || $shippingCodePostNL === '03533' || $shippingCodePostNL === '04936') {
 
-                            if(isset($shippingOptions['pickupLocation'])) {
+                            if(isset($shippingOptions['frontend']) && isset($shippingOptions['frontend']['dropoff_points_type']) && $shippingOptions['frontend']['dropoff_points_type'] == 'Pickup') {
 
-                                $pickupOptions = $shippingOptions['pickupLocation'];
+                                $pickupOptions = $shippingOptions['frontend'];
                                 if(
 
-                                    isset($pickupOptions['postal_code'])
-                                    && isset($pickupOptions['street'])
-                                    && 	isset($pickupOptions['number'])
-                                    && isset($pickupOptions['city'])
+                                    isset($pickupOptions['dropoff_points_address_postcode'])
+                                    && isset($pickupOptions['dropoff_points_address_address_1'])
+                                    && 	isset($pickupOptions['dropoff_points_address_address_2'])
+                                    && isset($pickupOptions['dropoff_points_address_city'])
                                 ) {
 
-                                    $orderShipPostCode = $pickupOptions['postal_code']; //Set for PGE
-                                    $orderShipPostcity = $pickupOptions['city']; //Set Set for PGE
-                                    $orderShipPostcountry = isset($pickupOptions['cc']) ? $pickupOptions['cc'] : $orderShipPostcountry ; //Set for PGE
-                                    $orderShipPoststreet =  $pickupOptions['street']; //Set for PGE
-                                    $orderShipPoststreetNum = $pickupOptions['number']; //Set for PGE
-                                    $orderShipPostcompany = isset($pickupOptions['location_name']) ? $pickupOptions['location_name'] : $orderShipPostcompany;
+                                    $orderShipPostCode = $pickupOptions['dropoff_points_address_postcode']; //Set for PGE
+                                    $orderShipPostcity = $pickupOptions['dropoff_points_address_city']; //Set Set for PGE
+                                    $orderShipPostcountry = isset($pickupOptions['dropoff_points_address_country']) ? $pickupOptions['dropoff_points_address_country'] : $orderShipPostcountry ; //Set for PGE
+                                    $orderShipPoststreet =  $pickupOptions['dropoff_points_address_address_1']; //Set for PGE
+                                    $orderShipPoststreetNum = $pickupOptions['dropoff_points_address_address_2']; //Set for PGE
+                                    $orderShipPostcompany = isset($pickupOptions['dropoff_points_address_company']) ? $pickupOptions['dropoff_points_address_company'] : $orderShipPostcompany;
                                 }
                             }
-
-
 
                         } else {
 
 
-                            if(isset($shippingOptions['date'])){
-
-                                $postNLdeliveryDate = strtotime($shippingOptions['date']);
+                            if(isset($shippingOptions['frontend']['delivery_day_date'])){
+                                $postNLdeliveryDate = strtotime($shippingOptions['frontend']['delivery_day_date']);
+                                $postNLdeliveryDateTime = strtotime($shippingOptions['frontend']['delivery_day_from']);
 
                                 if($postNLdeliveryDate > strtotime('tomorrow')) {
                                     $orderShipPostDeliveryDate = date('Y-m-d',$postNLdeliveryDate);
-                                    $orderShipPostDeliveryTime  = date('H:i', $postNLdeliveryDate);
+                                    $orderShipPostDeliveryTime  = date('H:i', $postNLdeliveryDateTime);
                                 }
 
-
-
-
                             }
-
 
                             /*if($orderShipPostDeliveryDate && isset($shippingOptions['time'])) {
 
@@ -285,7 +279,6 @@ class PostNLOrder extends PostNLProcess
                     }
 
                     if(strlen($orderShipPostcompany) > 35) {
-
                         $orderShipPostcompany = substr($orderShipPostcompany,0,35);
                     }
 
@@ -591,12 +584,12 @@ class PostNLOrder extends PostNLProcess
                             continue;
 //Customization for Rextro to skip bundled product as orderline when using plugin yith-woocommerce-product-bundles
 						if (metadata_exists( 'post', $orderedProduct->get_id(), '_yith_bundle_product_version' ))
-                            continue;  						
+                            continue;
 						if (metadata_exists( 'post', $orderedProduct->get_id(), '_yith_wcpb_bundle_data' ))
-                            continue;  													
+                            continue;
 //Customization for Rextro to skip bundled product as orderline when using plugin woocommerce-product-bundles
 						if (metadata_exists( 'post', $orderedProduct->get_id(), '_wc_pb_group_mode' ))
-                            continue;                       
+                            continue;
 
                         if(strlen($productSKU) == 0) {
                             $failed->addError(" No SKU Found in the ordered Item");
@@ -723,7 +716,9 @@ class PostNLOrder extends PostNLProcess
                     $is_valid_xml = $xml->schemaValidate(__DIR__.DIRECTORY_SEPARATOR.'schema'.DIRECTORY_SEPARATOR."deliveryOrder_new.xsd");
 
                 }
-
+  $logger = wc_get_logger();
+     $logger->info( "test2" );
+    $logger->info( wc_print_r( $is_valid_xml, true ) );
 
                 if( !$is_valid_xml) {
 
@@ -737,6 +732,7 @@ class PostNLOrder extends PostNLProcess
                                     $error->line, $error->column);
                         }
 
+                          $logger->info( wc_print_r(  $validationError, true ) );
                         libxml_clear_errors();
                         libxml_use_internal_errors(false);
 
@@ -765,6 +761,7 @@ class PostNLOrder extends PostNLProcess
 
                     $remote_directory = $Path . '/';
                     // $remote_directory = '/';
+
                     $success = $sftp->put($remote_directory . $filename, $xml->saveXml());
 
                     $table_name_ecs = $wpdb->prefix . 'ecs';
@@ -849,15 +846,15 @@ class PostNLOrder extends PostNLProcess
 		foreach($statesmeta as $k) {
 			if ($k->keytext == "Name") {
 				$nameRetailer = $k->value;
-												
+
 			}
-            
+
             if ($k->keytext == "Email") {
 				$email = $k->value;
-						
+
 			}
         }
-        
+
         return [
             'retailer'  =>   $nameRetailer,
             'email'     =>   $email

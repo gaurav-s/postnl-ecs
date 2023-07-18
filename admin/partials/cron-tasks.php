@@ -1,4 +1,4 @@
-<?php 
+<?php
 //Silence
 
 function postnlecs_cron_schedules($schedules) {
@@ -15,35 +15,35 @@ function postnlecs_cron_schedules($schedules) {
             'display' => __('Once every 5 minutes')
         );
     }
-    
+
     if (!isset($schedules["30min"])) {
         $schedules["30min"] = array(
             'interval' => 1800,
             'display' => __('Once every 30 minutes')
         );
     }
-    
+
     if (!isset($schedules["1hour"])) {
         $schedules["1hour"] = array(
             'interval' => 3600,
             'display' => __('Once every 1hour')
         );
     }
-    
+
     if (!isset($schedules["2hour"])) {
         $schedules["2hour"] = array(
             'interval' => 7200,
             'display' => __('Once every 2hour')
         );
     }
-    
+
     if (!isset($schedules["4hour"])) {
         $schedules["4hour"] = array(
             'interval' => 14400,
             'display' => __('Once every 4hour')
         );
     }
-    
+
     if (!isset($schedules["1day"])) {
         $schedules["1day"] = array(
             'interval' => 86400,
@@ -61,15 +61,15 @@ add_action('task_shipement_import', 'postnlecs_cron_shipment_import');
 add_action('task_inventory_import', 'postnlecs_cron_inventory_import');
 
 function postnlecs_cron_order_export() {
-    try{ 
-    
+    try{
+
         $postnlOrder = new PostNLOrder();
         $postnlOrder->processOrders();
     }
     catch(Exception $e){
-        
+
     }
-    
+
 }
 
 function postnlecs_cron_product_export() {
@@ -77,9 +77,9 @@ function postnlecs_cron_product_export() {
         $postnlproduct = new PostNLProduct();
         $postnlproduct->processProducts();
     }catch(Exception $e){
-        
+
     }
-    
+
 }
 
 function postnlecs_cron_shipment_import() {
@@ -87,7 +87,7 @@ function postnlecs_cron_shipment_import() {
         $postnlshipment = new PostNLShipment();
         $postnlshipment->processShipment();
     }catch(Exception $e){
-        
+
     }
 }
 
@@ -96,7 +96,7 @@ function postnlecs_cron_inventory_import() {
         $postnlStock = new PostNLStock();
         $postnlStock->processStock();
     }catch(Exception $e){
-        
+
     }
 }
 
@@ -117,10 +117,10 @@ function postnlecs_stop_cron_shipment() {
 }
 
 function postnlecs_cron_selection_display($Cron) {
-    
-    
-    
-        
+
+
+
+
     echo '
 <!-- Select Basic -->
 <div class="form-group">
@@ -136,9 +136,8 @@ echo '<option value="1day" '. ($Cron === "1day" ? 'selected' : '' ).' >1 daily</
 echo '<option value="0" '. (!$Cron  ? 'selected' : '' ).' >Stop</option>';
 echo '
 </select>
-<span class="help-block">Pick a schedule</span>  
+<span class="help-block">Pick a schedule</span>
 </div>
 </div>';
-    
-}
 
+}

@@ -1,9 +1,6 @@
 # postnl-ecs
 Integrator plugin for PostNL ECS
 
-Release 2.1.2 - 04-02-2022
-- Fix pickup Location code for Belgium
-
 Release 2.1.1 - 20-12-2021
 - Added Shipping code for Belgium
 

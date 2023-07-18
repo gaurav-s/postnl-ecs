@@ -161,9 +161,13 @@ class PostNLOrder extends PostNLProcess
                         }
                     }
 
-                    $node->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','orderNo', $order->get_id()));
+//Customization for Rextro function getretailername added to get retailername configured and to add in ordernumber as prefix
+					$retailerDetails = $this->getRetailerName();
+					$nameRetailer =  strtoupper($retailerDetails['retailer']);
 
-
+//                  $node->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','orderNo', $order->get_id()));
+                    $node->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','orderNo', ($nameRetailer) . ($order->get_id())));                        
+                        
                     $node->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','webOrderNo', $order->get_id()));
 
 
@@ -518,7 +522,9 @@ class PostNLOrder extends PostNLProcess
                     }
 
                     $node->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','invoiceToEmail', $order->get_billing_email()));
-                    $node->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','language', $newstring = substr(get_locale(), -2,2)));
+//Customization for Rextro function getretailername added to get retailername configured and to add as language/channel ID
+					$node->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','language', $nameRetailer));
+//                    $node->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','language', $newstring = substr(get_locale(), -2,2)));
                     $node->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','remboursAmount', ''));
 
                     $order_shipping_method_id = '';
@@ -583,7 +589,14 @@ class PostNLOrder extends PostNLProcess
                             continue;
                         if ($orderedProduct->is_downloadable('yes'))
                             continue;
-
+//Customization for Rextro to skip bundled product as orderline when using plugin yith-woocommerce-product-bundles
+						if (metadata_exists( 'post', $orderedProduct->get_id(), '_yith_bundle_product_version' ))
+                            continue;  						
+						if (metadata_exists( 'post', $orderedProduct->get_id(), '_yith_wcpb_bundle_data' ))
+                            continue;  													
+//Customization for Rextro to skip bundled product as orderline when using plugin woocommerce-product-bundles
+						if (metadata_exists( 'post', $orderedProduct->get_id(), '_wc_pb_group_mode' ))
+                            continue;                       
 
                         if(strlen($productSKU) == 0) {
                             $failed->addError(" No SKU Found in the ordered Item");
@@ -814,6 +827,43 @@ class PostNLOrder extends PostNLProcess
         }
 
     }
+
+//Customization for Rextro function getretailername added to get retailername configured and to add in ordernumber as prefix
+	    public function getRetailerName() {
+        global $wpdb;
+        $nameRetailer = '';
+		$email = '';
+        $table_name_ecs = $wpdb->prefix . 'ecs';
+		// find list of states in DB
+		$qry = "SELECT * FROM ".$table_name_ecs." WHERE keytext ='general' ORDER BY id DESC  LIMIT 1";
+		$states = $wpdb->get_results($qry);
+		$settingID = '';
+		foreach($states as $k) {
+			$settingID = $k->id;
+		}
+				// find list of states in DB
+		$table_name = $wpdb->prefix . 'ecsmeta';
+		$qrymeta = "SELECT * FROM ".$table_name." WHERE settingid = '".$settingID."'";
+		$statesmeta = $wpdb->get_results($qrymeta);
+
+		foreach($statesmeta as $k) {
+			if ($k->keytext == "Name") {
+				$nameRetailer = $k->value;
+												
+			}
+            
+            if ($k->keytext == "Email") {
+				$email = $k->value;
+						
+			}
+        }
+        
+        return [
+            'retailer'  =>   $nameRetailer,
+            'email'     =>   $email
+        ];
+    }
+
 
 
 }

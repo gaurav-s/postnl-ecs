@@ -105,10 +105,12 @@ class PostNLShipment extends PostNLProcess
                     
                     foreach ($xml->orderStatus as $stock) {
                         $orderid  = $stock->orderNo;
-                        $intOrder = (int) $orderid;
-                        if(false === get_post_status((int) $stock->orderNo)) {
+//Customization for Rextro remove retailername from ordernumber as prefix
+                        $intOrder = (string) $orderid;
+						$intOrder = substr($intOrder,2,strlen($intOrder));						
+                        if(false === get_post_status((int) $intOrder)) {
                             $validate = false; 
-                            array_push($inventory_errors, 'Order  ID :' . $stock->orderNo . '  is not found for the shipment');
+                            array_push($inventory_errors, 'Order  ID :' . $intOrder . '  is not found for the shipment');
                             continue; // Skip further check
                         }
 
@@ -144,7 +146,8 @@ class PostNLShipment extends PostNLProcess
                         foreach($stock->orderStatusLines as $pruduct1) {
                             foreach($pruduct1 as $pruduct) {
                                 $shippedOrders_ids .= $pruduct->itemNo . ":";
-                                $order = new WC_Order((int) $orderid);
+//Customization for Rextro remove retailername from ordernumber as prefix
+                                $order = new WC_Order((int) $intOrder);
                                 $items = $order->get_items('line_item');
                                 $productExist = "0";
                                 
@@ -179,11 +182,13 @@ class PostNLShipment extends PostNLProcess
                         foreach($xml->orderStatus as $stock) {
                             $orderid = $stock->orderNo;
                             $traclCode = $stock->trackAndTraceCode;
-                            $intOrder = (int) $orderid;
+//Customization for Rextro remove retailername from ordernumber as prefix
+                            $intOrder = (string) $orderid;
+							$intOrder = substr($intOrder,2,strlen($intOrder));
                             $stringTrack = (string) $traclCode;
                     
                             ///check if everything is shipped
-                            $order = new WC_Order((int) $orderid);
+                            $order = new WC_Order((int) $intOrder);
                             $items = $order->get_items('line_item');
                             $ordExportedItems = 0;
                             $countElement = 0;
@@ -198,7 +203,15 @@ class PostNLShipment extends PostNLProcess
                                     
                                 if ($lineItemProduct->is_downloadable('yes')) 
                                     continue;
-                                            
+//Customization for Rextro to skip bundled product as orderline when using plugin yith-woocommerce-product-bundles
+								if (metadata_exists( 'post', $lineItemProduct->get_id(), '_yith_bundle_product_version' ))
+	                            continue;
+								if (metadata_exists( 'post', $lineItemProduct->get_id(), '_yith_wcpb_bundle_data' ))
+	                            continue;						
+//Customization for Rextro to skip bundled product as orderline when using plugin woocommerce-product-bundles
+							if (metadata_exists( 'post', $lineItemProduct->get_id(), '_wc_pb_group_mode' ))
+        	                    continue;  
+                                   
                                 $ordExportedItems = $ordExportedItems +1;
                                     
                             }
@@ -221,7 +234,7 @@ class PostNLShipment extends PostNLProcess
                             //Mark Oorder as Completed
                             if($countElement == $ordExportedItems) {
                                     
-                                $order = wc_get_order((int) $orderid);
+                                $order = wc_get_order((int) $intOrder);
                                 $order->update_status('completed');
                                     
                             } else {

@@ -2,6 +2,14 @@
 
 Integrator plugin for PostNL ECS
 
+Release 2.1.5 - 28-07-2022
+
+- Fix issue for PostNL for WooCommerce
+
+Release 2.1.4 - 24-07-2022
+
+- Fix issue for PostNL for WooCommerce
+
 Release 2.1.3 - 14-07-2022
 
 - Fix issue for PostNL for WooCommerce

@@ -3,10 +3,10 @@
 	Plugin Name: WooCommerce PostNL-Fulfilment
 	Plugin URI: http://www.postnl.nl/
 	Description: PostNL Fulfilment plugin for WooCommerce
-	Version: 2.1.3 Customized for Rextro
+	Version: 2.1.5 Customized for Rextro
 	Author: PostNL
 	Author URI: http://www.postnl.nl/
-	Text Domain:       woocommercepostnlfulfillment
+	Text Domain: woocommercepostnlfulfillment
 	*/
 
 	/**
@@ -56,10 +56,10 @@
 	function postnlecs_plugin_install() {
 
 		// Require parent plugin
-    if ( ! is_plugin_active( 'woo-postnl/postnl-for-woocommerce.php' ) and current_user_can( 'activate_plugins' ) ) {
+    /*if ( ! is_plugin_active( 'woo-postnl/postnl-for-woocommerce.php' ) and current_user_can( 'activate_plugins' ) ) {
         // Stop activation redirect and show error
         wp_die('Sorry, but this plugin requires the <a target="_blank" href="https://wordpress.org/plugins/woo-postnl/">PostNl for woocommerce Plugin</a> to be installed and active. <br><a href="' . admin_url( 'plugins.php' ) . '">&laquo; Return to Plugins</a>');
-    }
+    }*/
 
 		global $wpdb;
 		$table_name = $wpdb->prefix . 'ecs';

@@ -13,9 +13,14 @@ Author URI: http://www.postnl.nl/
 
 function getPostNLEcsShippingCode($shippingCountry, $order) {
 
-    $postNlDeliveryType = new PostNLWooCommerce\Order\Single;
+
     $shippingOptions = $order->get_meta('_postnl_order_metadata');
     $found_shipping_classes = find_order_shipping_classes($order);
+    $postNlDeliveryType = '';
+    if (class_exists('PostNLWooCommerce\Order\Single')) {
+         $postNlDeliveryType = new PostNLWooCommerce\Order\Single;
+         $shippingOptions['deliveryType'] = $postNlDeliveryType->get_delivery_type( $order );
+    }
 
 
     if(!empty($found_shipping_classes)){
@@ -41,6 +46,7 @@ function getPostNLEcsShippingCode($shippingCountry, $order) {
         'Evening',
         'Standard'
     ];
+
     if($shippingOptions) {
 
         $shipmentOptions = '';
@@ -78,7 +84,6 @@ function getPostNLEcsShippingCode($shippingCountry, $order) {
 
 
             if($shippingOptions['packageType'] == 'package') {
-                 $shippingOptions['deliveryType'] = $postNlDeliveryType->get_delivery_type( $order );
                 $postNlCode = getpostnlMappingCodes($shippingOptions, $shippingCountry);
                 if(in_array($postNlCode,$saoArray))
                     $postNlCode = $postNlCode.$sinatureOption.$homeAddressOnly;
@@ -90,7 +95,6 @@ function getPostNLEcsShippingCode($shippingCountry, $order) {
 
         }
         else {
-             $shippingOptions['deliveryType'] = $postNlDeliveryType->get_delivery_type( $order );
             $postNlCode = getpostnlMappingCodes($shippingOptions, $shippingCountry);
             if(in_array($postNlCode,$saoArray))
                 $postNlCode = $postNlCode.$sinatureOption.$homeAddressOnly;
@@ -110,8 +114,10 @@ function getPostNLEcsShippingCode($shippingCountry, $order) {
 }
 
 function getpostnlMappingCodes($options, $countryCode) {
+	$match =  esc_html__( 'Pickup at PostNL Point', 'postnl-for-woocommerce' );
     if(isset($options['deliveryType'])) {
-        if(isset($options['isPickup']) && $options['deliveryType'] == 'Pickup at PostNL Point' && $options['isPickup']){
+
+        if(isset($options['isPickup']) && $options['deliveryType'] == $match && $options['isPickup']){
             if(strtolower($countryCode) === 'nl')
                 return  '03533';
             if(strtolower($countryCode) === 'be')
@@ -120,16 +126,16 @@ function getpostnlMappingCodes($options, $countryCode) {
                 return 'NA';
         }
 
-        if($options['deliveryType'] == 'Morning Delivery')
+        if($options['deliveryType'] == esc_html__( 'Morning Delivery', 'postnl-for-woocommerce' ) )
             return 'Morning';
 
         if(strtolower($countryCode) !== 'nl')
             return get_outside_nl_shipping($countryCode);
 
-        if($options['deliveryType'] == 'Evening Delivery')
+        if($options['deliveryType'] == esc_html__( 'Evening Delivery' , 'postnl-for-woocommerce' ))
             return 'Evening';
 
-        if($options['deliveryType'] == 'Standard Shipment')
+        if($options['deliveryType'] == esc_html__( 'Standard Shipment', 'postnl-for-woocommerce' ))
             return 'Standard';
     }
 

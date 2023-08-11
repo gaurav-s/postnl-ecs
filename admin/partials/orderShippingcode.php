@@ -101,15 +101,9 @@ function getPostNLEcsShippingCode($shippingCountry, $order) {
             return $postNlCode;
         }
 
-
-
-
     }
 
     return false;
-
-
-
 
 }
 
@@ -129,14 +123,15 @@ function getpostnlMappingCodes($options, $countryCode) {
         if($options['deliveryType'] == esc_html__( 'Morning Delivery', 'postnl-for-woocommerce' ) )
             return 'Morning';
 
-        if(strtolower($countryCode) !== 'nl')
-            return get_outside_nl_shipping($countryCode);
-
         if($options['deliveryType'] == esc_html__( 'Evening Delivery' , 'postnl-for-woocommerce' ))
             return 'Evening';
 
         if($options['deliveryType'] == esc_html__( 'Standard Shipment', 'postnl-for-woocommerce' ))
             return 'Standard';
+    }
+    else {
+        if(strtolower($countryCode) !== 'nl')
+            return get_outside_nl_shipping($countryCode);
     }
 
     return 'PNLP';

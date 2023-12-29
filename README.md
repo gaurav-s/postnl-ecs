@@ -2,6 +2,10 @@
 
 Integrator plugin for PostNL ECS
 
+Release 2.1.4 - 29-12-2023
+
+- Upgrade to the latest version 3.0 of phpseclib for PHP versions 8.0 and above.
+
 Release 2.1.3 - 29-05-2023
 
 - Compatibility with PHP8.1 version

@@ -6,19 +6,19 @@ Release 2.1.7 - 12-01-2024
 
 -  Upgrade to the latest version 3.0 of phpseclib for PHP versions 8.0 and above.
 
-Release 2.1.6 - 11-08-2022
+Release 2.1.6 - 11-08-2023
 
 - Fix issue for different country
 
-Release 2.1.5 - 28-07-2022
+Release 2.1.5 - 28-07-2023
 
 - Fix issue for PostNL for WooCommerce
 
-Release 2.1.4 - 24-07-2022
+Release 2.1.4 - 24-07-2023
 
 - Fix issue for PostNL for WooCommerce
 
-Release 2.1.3 - 14-07-2022
+Release 2.1.3 - 14-07-2023
 
 - Fix issue for PostNL for WooCommerce
 

@@ -170,7 +170,7 @@
 
 
 
-		} else { print_r( $ftpCheck[1]);
+		} else {
 			?>
     <div class="alert alert-danger">
      <strong> <?php echo $ftpCheck[1]; ?> </strong>

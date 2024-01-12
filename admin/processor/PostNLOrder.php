@@ -16,7 +16,7 @@ class PostNLOrder extends PostNLProcess
         $Path = '';
         $orderStatus = '';
         $shipment = '';
-        $no = '';
+        $no = 1;
 
         $settingID = $EcsOrderSettings->getSettingId();
         if($settingID) {
@@ -34,7 +34,7 @@ class PostNLOrder extends PostNLProcess
             }
 
             if ($k->keytext == "no") {
-                $no = $k->value;
+                $no = (int) $k->value;
             }
 
             if($k->keytext == "Cron") {
@@ -576,8 +576,8 @@ class PostNLOrder extends PostNLProcess
 
                     $exportedItems = 0;
                     foreach($items as $item) {
-                        $orderedProduct = $item->get_product();
-                        $productSKU = $orderedProduct->get_sku();
+                        $orderedProduct = $item->get_product();                       
+                        $productSKU =  $orderedProduct->get_sku() ? $orderedProduct->get_sku() : '';
 
                         if($orderedProduct->is_virtual())
                             continue;

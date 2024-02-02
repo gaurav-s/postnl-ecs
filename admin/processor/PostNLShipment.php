@@ -218,11 +218,19 @@ class PostNLShipment extends PostNLProcess
                                         
                             }
                                 
-                            //Mark Oorder as Completed
+                            //Mark Order as Completed
                             if($countElement == $ordExportedItems) {
                                     
                                 $order = wc_get_order((int) $orderid);
-                                $order->update_status('completed');
+								// Speedcube customization: add Track and Trace Code in order comment
+								$trackingnote = __("Tracking code:").$stringTrack;
+								$order->add_order_note( $trackingnote );								
+								if ($order->get_status() !== 'cancelled') {
+									// Update the order status to "completed" only if it's not cancelled
+									$order->update_status('completed');
+								}								
+								
+                                //$order->update_status('completed');
                                     
                             } else {
                                 $exportedItems =get_post_meta($intOrder, 'exportedItems', true);
@@ -234,7 +242,12 @@ class PostNLShipment extends PostNLProcess
                                     if($totalItems == $ordExportedItems) {
                                             
                                         $order = wc_get_order($intOrder);
-                                        $order->update_status('completed');
+										if ($order->get_status() !== 'cancelled') {
+											// Update the order status to "completed" only if it's not cancelled
+											$order->update_status('completed');
+										}	
+
+//										$order->update_status('completed');
                                             
                                     } else {
                                         $newExported = $exportedItems . " " . $shippedOrders_ids;

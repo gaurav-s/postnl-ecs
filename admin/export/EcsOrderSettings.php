@@ -128,8 +128,8 @@ class ecsOrderSettings {
         echo '<div class="form-group">
 <label class="col-md-4 control-label" for="textinput">Number of Orders per file</label>  
 <div class="col-md-4">
-<input id="textinput" name="no" type="number" placeholder="number" required="true" class="form-control input-md" value=' . $no . '>
-<span class="help-block">For example 3,5,10</span>  
+<input id="textinput" name="no" type="number" placeholder="number" required="true" class="form-control input-md" value="1" readonly="true">
+<span class="help-block">&nbsp;</span> 
 </div>
 </div>
 ';

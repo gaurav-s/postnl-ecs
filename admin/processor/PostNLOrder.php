@@ -16,7 +16,9 @@ class PostNLOrder extends PostNLProcess
         $Path = '';
         $orderStatus = '';
         $shipment = '';
-        $no = 1;
+//      $no = '';
+// Temp fix for this setting not getting saved in plugin order export settings
+        $no = '1';
 
         $settingID = $EcsOrderSettings->getSettingId();
         if($settingID) {
@@ -34,7 +36,9 @@ class PostNLOrder extends PostNLProcess
             }
 
             if ($k->keytext == "no") {
-                $no = (int) $k->value;
+//              $no = $k->value;
+// Temp fix for PHP 8 compatibility
+                $no =(int) $k->value;
             }
 
             if($k->keytext == "Cron") {
@@ -97,7 +101,10 @@ class PostNLOrder extends PostNLProcess
             $wpdb->query($wpdb->prepare("UPDATE ".$table_name_ecs." SET type = '".$NextorderNo."' WHERE   id= %d", $k->id));
         }
 
-        $NextorderNo = $orderNo + 1;
+// Temp fix for this setting not getting saved in plugin order export settings
+		$no = 1;
+		
+		$NextorderNo = $orderNo + 1;
 
         $Orderchunck  = array_chunk($ordersW, $no);
         $FailedOrders = array();
@@ -203,11 +210,13 @@ class PostNLOrder extends PostNLProcess
                     $shippingCodePostNL = getPostNLEcsShippingCode($order->get_shipping_country(), $order);
 
                     $orderShipPostCode = $order->get_shipping_postcode(); //Set from WC
-                    $orderShipPostcity = $order->get_shipping_city(); //Set from WC
+                    $orderShipPostcity = trim($order->get_shipping_city()); //Set from WC
                     $orderShipPostcountry = $order->get_shipping_country(); //Set from WC
-                    $orderShipPoststreet =  trim($order->get_shipping_address_1()); //Set from WC
+                    $orderShipPoststreet = trim($order->get_shipping_address_1()); //Set from WC
                     $orderShipPoststreetNum = trim($order->get_shipping_address_2()); //Set from WC
-                    $orderShipPostcompany = $order->get_shipping_company(); // Set from WC
+                    $orderShipPostcompany = trim($order->get_shipping_company()); // Set from WC
+					
+					
                     $orderShipPostDeliveryDate = '';
                     $orderShipPostDeliveryTime = '';
 
@@ -225,10 +234,9 @@ class PostNLOrder extends PostNLProcess
 
                                 $pickupOptions = $shippingOptions['pickupLocation'];
                                 if(
-
                                     isset($pickupOptions['postal_code'])
                                     && isset($pickupOptions['street'])
-                                    && 	isset($pickupOptions['number'])
+                                    && isset($pickupOptions['number'])
                                     && isset($pickupOptions['city'])
                                 ) {
 
@@ -237,7 +245,7 @@ class PostNLOrder extends PostNLProcess
                                     $orderShipPostcountry = isset($pickupOptions['cc']) ? $pickupOptions['cc'] : $orderShipPostcountry ; //Set for PGE
                                     $orderShipPoststreet =  $pickupOptions['street']; //Set for PGE
                                     $orderShipPoststreetNum = $pickupOptions['number']; //Set for PGE
-                                    $orderShipPostcompany = isset($pickupOptions['location_name']) ? $pickupOptions['location_name'] : $orderShipPostcompany;
+                                    $orderShipPostcompany = isset($pickupOptions['location_name']) ? htmlentities($pickupOptions['location_name']) : $orderShipPostcompany;
                                 }
                             }
 
@@ -285,10 +293,23 @@ class PostNLOrder extends PostNLProcess
                         $orderShipPostcompany = substr($orderShipPostcompany,0,35);
                     }
 
+				
 
-                    $node->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','shipToFirstName', $order->get_shipping_first_name()));
-                    $node->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','shipToLastName', $order->get_shipping_last_name()));
-                    $node->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','shipToCompanyName', $orderShipPostcompany));
+$firstname = $xml->createElementNS('http://www.toppak.nl/deliveryorder_new','shipToFirstName');
+$firstname->appendChild($xml->createCDATASection($order->get_shipping_first_name()));			  
+$node->appendChild($firstname);
+
+$lastname = $xml->createElementNS('http://www.toppak.nl/deliveryorder_new','shipToLastName');
+$lastname->appendChild($xml->createCDATASection($order->get_shipping_last_name()));			  
+$node->appendChild($lastname);
+
+$companyname = $xml->createElementNS('http://www.toppak.nl/deliveryorder_new','shipToCompanyName');
+$companyname->appendChild($xml->createCDATASection($orderShipPostcompany));			  
+$node->appendChild($companyname);			  			  
+
+//                    $node->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','shipToFirstName', htmlentities($order->get_shipping_first_name()) ));
+//                    $node->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','shipToLastName', htmlentities($order->get_shipping_last_name()) ));
+//                    $node->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','shipToCompanyName', htmlentities($orderShipPostcompany) ));
                     $node->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','shipToBuildingName', ''));
                     $node->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','shipToDepartment', ''));
 
@@ -327,7 +348,12 @@ class PostNLOrder extends PostNLProcess
                         }
                     }
 
-                    $node->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','shipToCity', $orderShipPostcity));
+
+$cityname = $xml->createElementNS('http://www.toppak.nl/deliveryorder_new','shipToCity');
+$cityname->appendChild($xml->createCDATASection($orderShipPostcity));			  
+$node->appendChild($cityname);	
+
+//                    $node->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','shipToCity', htmlentities($orderShipPostcity)));
 
 
                     if(strlen($orderShipPostcountry) == 0) {
@@ -384,9 +410,15 @@ class PostNLOrder extends PostNLProcess
                         }
                     }
 
-                    $node->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','shipToStreetHouseNrExt',
-                        (strlen($orderShipPoststreetNum) > 0) ? $orderShipPoststreet . " " . $orderShipPoststreetNum : $orderShipPoststreet
-                    ));
+
+$street = $xml->createElementNS('http://www.toppak.nl/deliveryorder_new','shipToStreetHouseNrExt');
+$street->appendChild($xml->createCDATASection(  (strlen($orderShipPoststreetNum) > 0) ? $orderShipPoststreet . " " . $orderShipPoststreetNum : $orderShipPoststreet   ));			  
+$node->appendChild($street);
+
+					
+//                    $node->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','shipToStreetHouseNrExt',
+//                        (strlen($orderShipPoststreetNum) > 0) ? $orderShipPoststreet . " " . $orderShipPoststreetNum : $orderShipPoststreet
+//                    ));
 
                     $node->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','shipToArea', ''));
 
@@ -430,9 +462,22 @@ class PostNLOrder extends PostNLProcess
                     }
 
 
-                    $node->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','invoiceToFirstName', $order->get_billing_first_name()));
-                    $node->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','invoiceToLastName', $order->get_billing_last_name()));
-                    $node->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','invoiceToCompanyName', $order->get_billing_company()));
+$ifirstname = $xml->createElementNS('http://www.toppak.nl/deliveryorder_new','invoiceToFirstName');
+$ifirstname->appendChild($xml->createCDATASection($order->get_billing_first_name()));			  
+$node->appendChild($ifirstname);
+
+$ilastname = $xml->createElementNS('http://www.toppak.nl/deliveryorder_new','invoiceToLastName');
+$ilastname->appendChild($xml->createCDATASection($order->get_billing_last_name()));			  
+$node->appendChild($ilastname);
+
+$icompanyname = $xml->createElementNS('http://www.toppak.nl/deliveryorder_new','invoiceToCompanyName');
+$icompanyname->appendChild($xml->createCDATASection($order->get_billing_company()));			  
+$node->appendChild($icompanyname);
+					
+
+//                    $node->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','invoiceToFirstName', htmlentities($order->get_billing_first_name()) ));
+//                    $node->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','invoiceToLastName', htmlentities($order->get_billing_last_name()) ));
+//                    $node->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','invoiceToCompanyName', htmlentities($order->get_billing_company()) ));
                     $node->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','invoiceToDepartment', ''));
                     $node->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','invoiceToFloor', ''));
                     $node->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','invoiceToDoorcode', ''));
@@ -461,8 +506,13 @@ class PostNLOrder extends PostNLProcess
                         }
                     }
 
-                    $node->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','invoiceToCity', $order->get_billing_city()));
-                    if(strlen($order->get_billing_country()) == 0) {
+$icityname = $xml->createElementNS('http://www.toppak.nl/deliveryorder_new','invoiceToCity');
+$icityname->appendChild($xml->createCDATASection($order->get_billing_city()));			  
+$node->appendChild($icityname);	
+					
+//					$node->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','invoiceToCity', htmlentities($order->get_billing_city())));
+
+					if(strlen($order->get_billing_country()) == 0) {
                         $failed->addError(" invoiceToCountryCode length is null");
                         $isvalidate = false;
                     } else {
@@ -496,9 +546,13 @@ class PostNLOrder extends PostNLProcess
                     }
 
 
-                    $node->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','invoiceToStreetHouseNrExt',
-                        (strlen(trim($order->get_billing_address_2())) > 0 ) ?  trim($order->get_billing_address_1()) . " " . trim($order->get_billing_address_2()) : trim($order->get_billing_address_1())
-                    ));
+$istreet = $xml->createElementNS('http://www.toppak.nl/deliveryorder_new','invoiceToStreetHouseNrExt');
+$istreet->appendChild($xml->createCDATASection(   (strlen(trim($order->get_billing_address_2())) > 0 ) ?  trim($order->get_billing_address_1()) . " " . trim($order->get_billing_address_2()) : trim($order->get_billing_address_1())     ));			  
+$node->appendChild($istreet);	
+					
+//                    $node->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','invoiceToStreetHouseNrExt',
+//                        (strlen(trim($order->get_billing_address_2())) > 0 ) ?  trim($order->get_billing_address_1()) . " " . trim($order->get_billing_address_2()) : trim($order->get_billing_address_1())
+//                    ));
 
                     $node->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','invoiceToArea', ''));
 
@@ -531,16 +585,56 @@ class PostNLOrder extends PostNLProcess
 
                     if(!$shippingCodePostNL) {
 
-                        if(strtolower($order->get_shipping_country()) === 'nl')
-                            $order_shipping_method_id = "PNLP";
-                        else
-                            $order_shipping_method_id = get_outside_nl_shipping($order->get_shipping_country());
+					//Change shippingAgentCode value for parcel type based on product CA's set on products
 
+					$pitems = $order->get_items('line_item');
+					$totalQuantity = 0;						
+					$StandardShipment = '';
+
+foreach ($pitems as $pitem) {
+    $orderedProducts = $pitem->get_product();
+    if (!empty($orderedProducts)) {
+        $totalQuantity += $pitem->get_quantity();
+        if ($orderedProducts->is_type('variation')) {
+            $orderedProductsParent = wc_get_product($orderedProducts->get_parent_id());
+            $pa_standard_parcel = $orderedProductsParent->get_attribute('StandardShipment');
+            $pa_mailbox_parcel = $orderedProductsParent->get_attribute('MailboxParcel');
+        } else {
+            $pa_standard_parcel = $orderedProducts->get_attribute('StandardShipment');
+            $pa_mailbox_parcel = $orderedProducts->get_attribute('MailboxParcel');
+        }
+
+        if ($pa_standard_parcel === 'yes') {
+            $StandardShipment = 'true';
+            $totalQuantity -= $pitem->get_quantity();
+        }
+        if ($pitem['qty'] > $pa_mailbox_parcel) {
+            $StandardShipment = 'true';
+        }
+        if ($totalQuantity > $pa_mailbox_parcel) {
+            $StandardShipment = 'true';
+        }
+
+        // $test_value_ca = $pa_standard_parcel . "-" . $pa_mailbox_parcel . "-A" . $totalQuantity;
+    } else {
+        // Handle the case when $orderedProducts is empty (optional)
+        $StandardShipment = 'true';
+    }
+}	
+						
+                        if(strtolower($order->get_shipping_country()) === 'nl' && $StandardShipment === 'true') {
+                            $order_shipping_method_id = "PNLP";
+                        } else if(strtolower($order->get_shipping_country()) === 'nl' && $pa_mailbox_parcel = 1) {
+							$order_shipping_method_id = "02928";
+						} else {
+                            $order_shipping_method_id = get_outside_nl_shipping($order->get_shipping_country());
+						}
 
                     } else { //From PostNL-WooCommerce Plugin
-                        $order_shipping_method_id = $shippingCodePostNL;
+                        	$order_shipping_method_id = $shippingCodePostNL;
                     }
-
+					
+					
                     //Add Age Check option for NL
                     $ageCheckoption = postnl_fulfilment_shipping_age_check($order->get_shipping_country(), $order);
 
@@ -575,80 +669,84 @@ class PostNLOrder extends PostNLProcess
                     $items = $order->get_items('line_item');
 
                     $exportedItems = 0;
-                    foreach($items as $item) {
-                        $orderedProduct = $item->get_product();                       
-                        $productSKU =  $orderedProduct->get_sku() ? $orderedProduct->get_sku() : '';
+foreach ($items as $item) {
+    $orderedProduct = $item->get_product();
+    if (empty($orderedProduct)) {
+        $failed->addError(" No product object Found in the order");
+        $isvalidate = false;
+        continue;
+    }
+    
+    $productSKU = $orderedProduct->get_sku();
 
-                        if($orderedProduct->is_virtual())
-                            continue;
-                        if ($orderedProduct->is_downloadable('yes'))
-                            continue;
+    if ($orderedProduct->is_virtual()) {
+        continue;
+    }
+    if ($orderedProduct->is_downloadable('yes')) {
+        continue;
+    }
 
+    if (strlen($productSKU) == 0) {
+        $failed->addError(" No SKU Found in the ordered Item");
+        $isvalidate = false;
+    } elseif (strlen($productSKU) > 24) {
+        $failed->addError(" Item SKU length is greater than 24 characters");
+        $isvalidate = false;
+    }
 
-                        if(strlen($productSKU) == 0) {
-                            $failed->addError(" No SKU Found in the ordered Item");
-                            $isvalidate = false;
-                        } elseif (strlen($productSKU) > 24) {
+    if (strlen($item['qty']) == 0) {
+        $failed->addError(" quantity length is null");
+        $isvalidate = false;
+    } else {
+        if (strlen($item['qty']) > 5) {
+            $failed->addError(" quantity length is greater than 5 characters");
+            $isvalidate = false;
+        }
+    }
 
-                            $failed->addError(" Item SKU length is greater than 24 characters");
-                            $isvalidate = false;
-                        }
+    $orderItemName = '';
 
-                        if(strlen($item['qty']) == 0) {
-                            $failed->addError(" quantity length is null");
-                            $isvalidate = false;
-                        } else {
-                            if(strlen($item['qty']) > 5) {
-                                $failed->addError(" quantity length is greater than 5 characters");
-                                $isvalidate = false;
-                            }
-                        }
+    if (strlen($item['name']) > 255) {
+        $orderItemName = substr($item['name'], 0, 255);
+    } else {
+        $orderItemName = $item['name'];
+    }
 
-                        $orderItemName = '';
+    $orderItemNameClean = str_replace($this->_getBadCharacters(), '', $orderItemName);
 
+    $line = $xml->createElementNS('http://www.toppak.nl/deliveryorder_new', 'deliveryOrderLine');
+    $line->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new', 'itemNo', $productSKU));
+    $line->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new', 'itemDescription', $orderItemNameClean));
+    $line->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new', 'quantity', $item['qty']));
+    $line->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new', 'singlePriceInclTax', $this->formatnumber($item['line_subtotal'])));
 
-                        if(strlen($item['name']) > 255) {
-                            $orderItemName = substr($item['name'],0,255);
-                        } else
-                            $orderItemName = $item['name'];
+    $giftMessage = '';
+    $itemmeta = $item->get_meta_data();
 
-                        $orderItemNameClean = str_replace($this->_getBadCharacters(), '', $orderItemName);
+    if (is_array($itemmeta)) {
+        foreach ($itemmeta as $metaobject) {
+            $itemmetadata = $metaobject->get_data();
+            if ($itemmetadata['key'] === 'card_message_text') {
+                $giftMessage = $itemmetadata['value'];
 
+                $giftMessage = str_replace($this->_getBadCharacters(), '', $giftMessage);
+                $giftMessage = substr($giftMessage, 0, 255);
+            }
+        }
+    }
 
-                        $line = $xml->createElementNS('http://www.toppak.nl/deliveryorder_new','deliveryOrderLine');
-                        $line->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','itemNo', $productSKU));
-                        $line->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','itemDescription', $orderItemNameClean));
-                        $line->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','quantity', $item['qty']));
-                        $line->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','singlePriceInclTax', $this->formatnumber($item['line_subtotal'])));
+    if (!empty($giftMessage)) {
+        $line->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new', 'GiftWrap', '9'));
+        $line->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new', 'GiftCardInstruction', $giftMessage));
+    }
 
-                        $giftMessage = '';
-                        $itemmeta = $item->get_meta_data();
+    $node2->appendChild($line);
 
-                        if(is_array($itemmeta)) {
-                            foreach ($itemmeta as $metaobject) {
-                                $itemmetadata = $metaobject->get_data();
-                                if($itemmetadata['key'] === 'card_message_text') {
-                                    $giftMessage = $itemmetadata['value'];
+    if ($isvalidate == true) {
+        $exportedItems = $exportedItems + 1;
+    }
+}
 
-                                    $giftMessage = str_replace($this->_getBadCharacters(), '', $giftMessage);
-                                    $giftMessage = substr($giftMessage,0,255);
-                                }
-
-
-                            }
-                        }
-
-                        if(!empty($giftMessage)){
-                            $line->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','GiftWrap', '9'));
-                            $line->appendChild($xml->createElementNS('http://www.toppak.nl/deliveryorder_new','GiftCardInstruction', $giftMessage));
-                        }
-
-                        $node2->appendChild($line);
-
-                        if ($isvalidate == true)
-                            $exportedItems = $exportedItems + 1;
-
-                    }
 
                     if ($exportedItems == 0 ) {
                         $isvalidate = false;

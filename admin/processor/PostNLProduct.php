@@ -70,7 +70,7 @@ class PostNLProduct extends PostNLProcess
             $wpdb->query($wpdb->prepare("UPDATE $table_name_ecs SET type = '".$NextorderNo."' WHERE  id= %d", $k->id));
         }
 
-        $xml = new DOMDocument();
+        $xml = new DOMDocument('1.0');
         $message = $xml->createElementNS("http://www.toppak.nl/item", 'message');
         $xml->appendChild($message);
         $message->appendChild($xml->createElementNS("http://www.toppak.nl/item",'type', 'item'));
@@ -115,7 +115,214 @@ class PostNLProduct extends PostNLProcess
                 $failed->set_orderID($product_id);
                 $productpost = $productPostItem;
                 //$product = new WC_Product($product_id);
-
+/*
+					if($product_id == 273761)
+						continue;				
+					if($product_id == 21075)
+						continue;
+					if($product_id == 21076)
+						continue;					
+					if($product_id == 21073)
+						continue;
+					if($product_id == 21074)
+						continue;					
+					if($product_id == 21071)
+						continue;
+					if($product_id == 21072)
+						continue;
+					if($product_id == 21069)
+						continue;
+					if($product_id == 21070)
+						continue;
+					if($product_id == 21064)
+						continue;
+					if($product_id == 21065)
+						continue;					
+					if($product_id == 21062)
+						continue;
+					if($product_id == 21061)
+						continue;
+					if($product_id == 21059)
+						continue;
+					if($product_id == 21060)
+						continue;
+					if($product_id == 13297)
+						continue;
+					if($product_id == 13307)
+						continue;					
+					if($product_id == 13308)
+						continue;
+					if($product_id == 13309)
+						continue;					
+					if($product_id == 13296)
+						continue;
+					if($product_id == 13011)
+						continue;
+					if($product_id == 13013)
+						continue;
+					if($product_id == 13014)
+						continue;
+					if($product_id == 13016)
+						continue;
+					if($product_id == 13018)
+						continue;					
+					if($product_id == 13020)
+						continue;
+					if($product_id == 13022)
+						continue;
+					if($product_id == 13024)
+						continue;
+					if($product_id == 13026)
+						continue;
+					if($product_id == 13029)
+						continue;
+					if($product_id == 13031)
+						continue;
+					if($product_id == 13001)
+						continue;
+					if($product_id == 13002)
+						continue;					
+					if($product_id == 13003)
+						continue;
+					if($product_id == 12782)
+						continue;
+					if($product_id == 12781)
+						continue;
+					if($product_id == 12619)
+						continue;
+					if($product_id == 12621)
+						continue;
+					if($product_id == 12632)
+						continue;					
+					if($product_id == 12634)
+						continue;
+					if($product_id == 12645)
+						continue;					
+					if($product_id == 12649)
+						continue;
+					if($product_id == 12650)
+						continue;
+					if($product_id == 12517)
+						continue;
+					if($product_id == 12518)
+						continue;
+					if($product_id == 12279)
+						continue;
+					if($product_id == 12281)
+						continue;					
+					if($product_id == 12282)
+						continue;
+					if($product_id == 12185)
+						continue;
+					if($product_id == 12188)
+						continue;
+					if($product_id == 11708)
+						continue;
+					if($product_id == 11705)
+						continue;
+					if($product_id == 11418)
+						continue;					
+					if($product_id == 11422)
+						continue;
+					if($product_id == 11423)
+						continue;
+					if($product_id == 11427)
+						continue;
+					if($product_id == 11428)
+						continue;
+					if($product_id == 11432)
+						continue;
+					if($product_id == 11482)
+						continue;					
+					if($product_id == 11483)
+						continue;
+					if($product_id == 11333)
+						continue;					
+					if($product_id == 11334)
+						continue;
+					if($product_id == 11335)
+						continue;
+					if($product_id == 11343)
+						continue;
+					if($product_id == 11344)
+						continue;
+					if($product_id == 11345)
+						continue;
+					if($product_id == 11320)
+						continue;					
+					if($product_id == 11321)
+						continue;
+					if($product_id == 11322)
+						continue;
+					if($product_id == 11332)
+						continue;
+					if($product_id == 11258)
+						continue;
+					if($product_id == 11259)
+						continue;
+					if($product_id == 11260)
+						continue;					
+					if($product_id == 11278)
+						continue;
+					if($product_id == 11250)
+						continue;
+					if($product_id == 11251)
+						continue;
+					if($product_id == 11252)
+						continue;
+					if($product_id == 11233)
+						continue;
+					if($product_id == 11234)
+						continue;					
+					if($product_id == 11235)
+						continue;
+					if($product_id == 11241)
+						continue;					
+					if($product_id == 11242)
+						continue;
+					if($product_id == 11231)
+						continue;
+					if($product_id == 11232)
+						continue;
+					if($product_id == 11200)
+						continue;
+					if($product_id == 11201)
+						continue;
+					if($product_id == 11092)
+						continue;					
+					if($product_id == 11093)
+						continue;
+					if($product_id == 11094)
+						continue;
+					if($product_id == 11095)
+						continue;
+					if($product_id == 11105)
+						continue;
+					if($product_id == 11106)
+						continue;
+					if($product_id == 10985)
+						continue;
+					if($product_id == 10997)
+						continue;
+					if($product_id == 10998)
+						continue;
+					if($product_id == 11024)
+						continue;
+					if($product_id == 11025)
+						continue;
+					if($product_id == 11107)
+						continue;
+					if($product_id == 10944)
+						continue;
+					if($product_id == 10945)
+						continue;
+					if($product_id == 10958)
+						continue;
+					if($product_id == 10959)
+						continue;
+					if($product_id == 10971)
+						continue;
+*/
                 if($productPostItem->post_type == 'product_variation') {
                     $product = new WC_Product_Variation($product_id);
                 }
@@ -158,14 +365,14 @@ class PostNLProduct extends PostNLProcess
                 } else {
                     $description2 = '';
                     if(strlen($product->get_title()) > 30) {
-                        $description2 = substr($product->get_title(), 30,30);
+                        $description2 = htmlentities(substr($product->get_title(), 30,30));
                         //split in two
-                        $node->appendChild($xml->createElementNS("http://www.toppak.nl/item",'description', substr($product->get_title(), 0, 30)));
+                        $node->appendChild($xml->createElementNS("http://www.toppak.nl/item",'description', htmlentities(substr($product->get_title(), 0, 30))));
 
                         $node->appendChild($xml->createElementNS("http://www.toppak.nl/item",'description2', $description2));
                     } else {
                         //split in two
-                        $node->appendChild($xml->createElementNS("http://www.toppak.nl/item",'description', $product->get_title()));
+                        $node->appendChild($xml->createElementNS("http://www.toppak.nl/item",'description', htmlentities($product->get_title())));
                         $node->appendChild($xml->createElementNS("http://www.toppak.nl/item",'description2', ''));
                     }
                 }

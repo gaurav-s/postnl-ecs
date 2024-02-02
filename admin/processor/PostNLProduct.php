@@ -60,6 +60,7 @@ class PostNLProduct extends PostNLProcess
 
         global $wpdb;
         $table_name_ecs = $wpdb->prefix . 'ecs';
+
         $qrymeta = "SELECT * FROM $table_name_ecs " . "WHERE keytext = 'LastproductID'  ";
         $statesmeta = $wpdb->get_results($qrymeta);
         $orderNo = '0';
@@ -82,11 +83,14 @@ class PostNLProduct extends PostNLProcess
 
         $products = $xml->createElementNS("http://www.toppak.nl/item",'items');
         $message->appendChild($products);
+        $default_lang = apply_filters('wpml_default_language', NULL );
         $Products = get_posts(
             array(
                 'post_type' => array('product','product_variation'),
                 //'post_status' => wc_get_order_statuses(), //get all available order statuses in an array
                 'posts_per_page' => 100,
+				'suppress_filters' => false,
+				'lang' => $default_lang,
                 'meta_query' => array(
                     array(
                         'key' => 'ecsExport',
@@ -117,15 +121,15 @@ class PostNLProduct extends PostNLProcess
                 //$product = new WC_Product($product_id);
 /*
 					if($product_id == 273761)
-						continue;				
+						continue;
 					if($product_id == 21075)
 						continue;
 					if($product_id == 21076)
-						continue;					
+						continue;
 					if($product_id == 21073)
 						continue;
 					if($product_id == 21074)
-						continue;					
+						continue;
 					if($product_id == 21071)
 						continue;
 					if($product_id == 21072)
@@ -137,7 +141,7 @@ class PostNLProduct extends PostNLProcess
 					if($product_id == 21064)
 						continue;
 					if($product_id == 21065)
-						continue;					
+						continue;
 					if($product_id == 21062)
 						continue;
 					if($product_id == 21061)
@@ -149,11 +153,11 @@ class PostNLProduct extends PostNLProcess
 					if($product_id == 13297)
 						continue;
 					if($product_id == 13307)
-						continue;					
+						continue;
 					if($product_id == 13308)
 						continue;
 					if($product_id == 13309)
-						continue;					
+						continue;
 					if($product_id == 13296)
 						continue;
 					if($product_id == 13011)
@@ -165,7 +169,7 @@ class PostNLProduct extends PostNLProcess
 					if($product_id == 13016)
 						continue;
 					if($product_id == 13018)
-						continue;					
+						continue;
 					if($product_id == 13020)
 						continue;
 					if($product_id == 13022)
@@ -181,7 +185,7 @@ class PostNLProduct extends PostNLProcess
 					if($product_id == 13001)
 						continue;
 					if($product_id == 13002)
-						continue;					
+						continue;
 					if($product_id == 13003)
 						continue;
 					if($product_id == 12782)
@@ -193,11 +197,11 @@ class PostNLProduct extends PostNLProcess
 					if($product_id == 12621)
 						continue;
 					if($product_id == 12632)
-						continue;					
+						continue;
 					if($product_id == 12634)
 						continue;
 					if($product_id == 12645)
-						continue;					
+						continue;
 					if($product_id == 12649)
 						continue;
 					if($product_id == 12650)
@@ -209,7 +213,7 @@ class PostNLProduct extends PostNLProcess
 					if($product_id == 12279)
 						continue;
 					if($product_id == 12281)
-						continue;					
+						continue;
 					if($product_id == 12282)
 						continue;
 					if($product_id == 12185)
@@ -221,7 +225,7 @@ class PostNLProduct extends PostNLProcess
 					if($product_id == 11705)
 						continue;
 					if($product_id == 11418)
-						continue;					
+						continue;
 					if($product_id == 11422)
 						continue;
 					if($product_id == 11423)
@@ -233,11 +237,11 @@ class PostNLProduct extends PostNLProcess
 					if($product_id == 11432)
 						continue;
 					if($product_id == 11482)
-						continue;					
+						continue;
 					if($product_id == 11483)
 						continue;
 					if($product_id == 11333)
-						continue;					
+						continue;
 					if($product_id == 11334)
 						continue;
 					if($product_id == 11335)
@@ -249,7 +253,7 @@ class PostNLProduct extends PostNLProcess
 					if($product_id == 11345)
 						continue;
 					if($product_id == 11320)
-						continue;					
+						continue;
 					if($product_id == 11321)
 						continue;
 					if($product_id == 11322)
@@ -261,7 +265,7 @@ class PostNLProduct extends PostNLProcess
 					if($product_id == 11259)
 						continue;
 					if($product_id == 11260)
-						continue;					
+						continue;
 					if($product_id == 11278)
 						continue;
 					if($product_id == 11250)
@@ -273,11 +277,11 @@ class PostNLProduct extends PostNLProcess
 					if($product_id == 11233)
 						continue;
 					if($product_id == 11234)
-						continue;					
+						continue;
 					if($product_id == 11235)
 						continue;
 					if($product_id == 11241)
-						continue;					
+						continue;
 					if($product_id == 11242)
 						continue;
 					if($product_id == 11231)
@@ -289,7 +293,7 @@ class PostNLProduct extends PostNLProcess
 					if($product_id == 11201)
 						continue;
 					if($product_id == 11092)
-						continue;					
+						continue;
 					if($product_id == 11093)
 						continue;
 					if($product_id == 11094)

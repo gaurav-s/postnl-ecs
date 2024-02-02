@@ -2,6 +2,10 @@
 
 Integrator plugin for PostNL ECS
 
+Release 2.1.5 - 02-02-2024
+
+- Set Number of file for Shipment import cron
+
 Release 2.1.4 - 29-12-2023
 
 - Upgrade to the latest version 3.0 of phpseclib for PHP versions 8.0 and above.

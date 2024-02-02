@@ -15,7 +15,7 @@
 				<?php
 					require_once(__DIR__ . "/ecsShipmentSettings.php");
 				require_once(dirname(__DIR__) . "/ecsSftpProcess.php");
-		 
+
 		// find list of states in DB
 		$EcsShipmentSettings = ecsShipmentSettings::init();
     if (!isset($_POST['shipmentImport'])) {
@@ -26,9 +26,10 @@
         $tracking       = '';
         $enable         = '';
         $lastfile       = '';
+								$no             = '';
         // find list of states in DB
 			$settingID = $EcsShipmentSettings->getSettingId();
-		
+
        	if(!empty($settingID)){
 			$statesmeta = $EcsShipmentSettings->loadShipmentSettings($settingID);
 			foreach ($statesmeta as $k) {
@@ -44,18 +45,21 @@
 				if ($k->keytext == "Inform") {
 					$Inform = $k->value;
 				}
+				if ($k->keytext == "no") {
+					$no = $k->value;
+				}
 			}
 		}
-        
-			$EcsShipmentSettings->displayShipmentSettings($Cron,$Path, $tracking, $Inform);
-		
-		
-        
-       
+
+			$EcsShipmentSettings->displayShipmentSettings($Cron,$Path, $tracking, $Inform, $no);
+
+
+
+
     }
 ?>
 				<?php
-    
+
     if (isset($_POST['shipmentImport'])) {
         // handle post data
        // $localFile  = ECS_DATA_PATH."\shipment.xml;
@@ -68,31 +72,41 @@
         //$Status     = $_POST["Status"];
         $Path       = $_POST["Path"];
         $tracking   = $_POST["tracking"];
-        
+								$no  = $_POST["no"];
+
 		$EcsSftpProcess = ecsSftpProcess::init();
-        
+
 		$ftpCheck = $EcsSftpProcess->checkSftpSettings($Path);
-		
+
 		if($ftpCheck[0] == 'SUCCESS') {
-		
+
 		$settingID = $EcsShipmentSettings->getSettingId();
-		
+
 		if ($settingID == '') {
 				$id = $EcsShipmentSettings->saveSettings();
 				$EcsShipmentSettings->saveSettingsValues($id,'Cron',$Cron);
 				$EcsShipmentSettings->saveSettingsValues($id,'tracking',$tracking);
 				$EcsShipmentSettings->saveSettingsValues($id,'Path',$Path);
 				$EcsShipmentSettings->saveSettingsValues($id,'Inform',$Inform);
-			
-				
+				$EcsShipmentSettings->saveSettingsValues($id,'no',$no);
+
 				} else {
 				$statesmeta = $EcsShipmentSettings->getSettingValues($settingID);
+				$setNo = false;
 				foreach ($statesmeta as $k) {
 							if ($k->keytext == "Cron") $EcsShipmentSettings->updateSettingsValues($k->id,$Cron);
 							if ($k->keytext == "Path") $EcsShipmentSettings->updateSettingsValues($k->id,$Path);
 							if ($k->keytext == "tracking") $EcsShipmentSettings->updateSettingsValues($k->id,$tracking);
 							if ($k->keytext == "Inform") $EcsShipmentSettings->updateSettingsValues($k->id,$Inform);
+
+							if ($k->keytext == "no") {
+								$EcsShipmentSettings->updateSettingsValues($k->id,$no);
+								$setNo = true;
+							}
 						}
+						if(!$setNo)
+								$EcsShipmentSettings->saveSettingsValues($settingID,'no',$no);
+
 				}
 		if ($Cron == '0') {
 					postnlecs_stop_cron_shipment();
@@ -104,28 +118,28 @@
 								}
 				}
 		echo '<div class="alert alert-success">
-			<strong>Updated successfully</strong> 
+			<strong>Updated successfully</strong>
 			</div>';
-		
+
 		} else {
 			?>
 					<div class="alert alert-danger">
 						<strong> <?php echo $ftpCheck[1]; ?> </strong>
 					</div>
 					<?php
-		
+
 		}
-		$EcsShipmentSettings->displayShipmentSettings($Cron,$Path, $tracking, $Inform);
+		$EcsShipmentSettings->displayShipmentSettings($Cron,$Path, $tracking, $Inform, $no);
 		 echo "<script>
 		$(document).ready(function(){
 			$('#collapse5').collapse('show');
 		});
 	</script>";
-		
-        
-       
+
+
+
     }
-?>  
+?>
 				<!-- Button -->
 				<div class="form-group">
 					<label class="col-md-4 control-label" for="singlebutton"></label>

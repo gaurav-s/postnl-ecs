@@ -625,7 +625,7 @@ class PostNLProduct extends PostNLProcess
                         }
 
                         // Generate a unique filename for the XML file
-                        $file_name = 'error_' . uniqid() . '.xml';
+                        $file_name = 'product-export-error.xml';
 
                         // Full path to the XML file
                         $file_path = $errors_dir . $file_name;

@@ -613,6 +613,26 @@ class PostNLProduct extends PostNLProcess
 
                         }
 
+                        // Path to the uploads directory
+                        $uploads_dir = wp_upload_dir();
+
+                        // Path to the errors directory within uploads
+                        $errors_dir = $uploads_dir['basedir'] . '/errors/';
+
+                        // Create the errors directory if it doesn't exist
+                        if (!file_exists($errors_dir)) {
+                            wp_mkdir_p($errors_dir);
+                        }
+
+                        // Generate a unique filename for the XML file
+                        $file_name = 'error_' . uniqid() . '.xml';
+
+                        // Full path to the XML file
+                        $file_path = $errors_dir . $file_name;
+
+                        $file = $xml->saveXML(); // put string in test1
+                        $xml->save($file_path);
+
                         $failed = new Failederrors();
                         $failed->set_orderID('');
 

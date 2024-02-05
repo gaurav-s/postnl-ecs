@@ -1,6 +1,9 @@
 # postnl-ecs
 Integrator plugin for PostNL ECS
 
+Release 2.1.4 - 05-02-2024
+- Validation check for XML
+
 Release 2.1.3 - 02-02-2024
 - Product Export of Default language for WPML
 

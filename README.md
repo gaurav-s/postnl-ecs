@@ -2,6 +2,10 @@
 
 Integrator plugin for PostNL ECS
 
+Release 2.1.6 - 09-02-2024
+
+-  Resolved issue for XML Validation
+
 Release 2.1.5 - 02-02-2024
 
 - Set Number of file for Shipment import cron

@@ -492,13 +492,13 @@ class PostNLProduct extends PostNLProcess
                 //EAN
                 if(strlen($eanNo) == 0) {
                     $eanNo = $product->get_sku();
-
-                } else {
-                    if(strlen($eanNo) > 15) {
-                        $failed->addError(" eanNo length is greater than 15 characters");
-                        $isvalidate = false;
-                    }
                 }
+
+                if(strlen($eanNo) > 15) {
+                    $failed->addError(" eanNo length is greater than 15 characters");
+                    $isvalidate = false;
+                }
+
                 $node->appendChild($xml->createElementNS("http://www.toppak.nl/item",'eanNo', $eanNo));
 
                 //BAC

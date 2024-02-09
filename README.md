@@ -1,6 +1,9 @@
 # postnl-ecs
 Integrator plugin for PostNL ECS
 
+Release 2.1.5 - 09-02-2024
+- Resolved issue for XML Validation
+
 Release 2.1.4 - 05-02-2024
 - Validation check for XML
 

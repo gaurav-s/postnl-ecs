@@ -1,24 +1,24 @@
 <?php
-	use phpseclib3\Crypt\RSA;
-	use phpseclib3\Net\SSH2;
-	use phpseclib3\Net\SFTP;
+use phpseclib3\Crypt\RSA;
+use phpseclib3\Net\SSH2;
+use phpseclib3\Net\SFTP;
 ?>
-<div class="panel panel-default space"  >
-	<div class="panel-heading">
-		<h4 class="panel-title">
-			<a data-toggle="collapse" data-parent="#accordion" href="#collapse2">
-				SFTP configuration</a>
-		</h4>
-	</div>
-	<div id="collapse2" class="panel-collapse collapse">
-		<div class="panel-body">
-		</div>
-		<form class="form-horizontal" action="" method="post">
-			<fieldset>
-				<!-- Form Name -->
-				<legend></legend>
-				<!-- Text input-->
-				<?php
+<div class="panel panel-default space">
+ <div class="panel-heading">
+  <h4 class="panel-title">
+   <a data-toggle="collapse" data-parent="#accordion" href="#collapse2">
+    SFTP configuration</a>
+  </h4>
+ </div>
+ <div id="collapse2" class="panel-collapse collapse">
+  <div class="panel-body">
+  </div>
+  <form class="form-horizontal" action="" method="post">
+   <fieldset>
+    <!-- Form Name -->
+    <legend></legend>
+    <!-- Text input-->
+    <?php
     require_once __DIR__ . "/ecsSftpProcess.php";
 
     // find list of states in DB
@@ -59,7 +59,7 @@
         );
     }
     ?>
-				<?php
+    <?php
     if (isset($_POST["singlebutton"])) {
         $ftp_source_file_name = "testb.xml";
         $ftp_dest_file_name = $ftp_source_file_name;
@@ -71,27 +71,26 @@
         $user = $_POST["Username"];
         $pass = $_POST["PrivateKey"];
 
-		$key = RSA::loadPrivateKey($pass);
+        $key = RSA::loadPrivateKey($pass);
         $ssh = new SSH2($host);
         $local_directory = "test2.xml";
         $remote_directory = "/woocommerce_test/Order/";
         $sftp = new SFTP($host);
 
-
         if (!$sftp->login($user, $key) || !$ssh->login($user, $key)) { ?>
-				<div class="alert alert-danger">
-					<strong>  There was an error. Please check again your credentials</strong>
-				</div>
-				<?php $EcsSftpSettings->displaySftpSettings(
+    <div class="alert alert-danger">
+     <strong> There was an error. Please check again your credentials</strong>
+    </div>
+    <?php $EcsSftpSettings->displaySftpSettings(
         $host,
         $user,
         $pass,
         $port
     );} else { ?>
-				<div class="alert alert-success">
-					<strong>Updated successfully</strong>
-				</div>
-				<?php
+    <div class="alert alert-success">
+     <strong>Updated successfully</strong>
+    </div>
+    <?php
     $settingID1 = $EcsSftpSettings->getSettingId();
 
     global $wpdb;
@@ -132,14 +131,14 @@ $('#collapse2').collapse('show');
 
 // Silence is golden.
 ?>
-				<!-- Button -->
-				<div class="form-group">
-					<label class="col-md-4 control-label" for="singlebutton"></label>
-					<div class="col-md-4">
-						<button id="singlebutton" name="singlebutton" class="btn btn-primary" type="submit" >Save</button>
-					</div>
-				</div>
-			</fieldset>
-		</form>
-	</div>
+    <!-- Button -->
+    <div class="form-group">
+     <label class="col-md-4 control-label" for="singlebutton"></label>
+     <div class="col-md-4">
+      <button id="singlebutton" name="singlebutton" class="btn btn-primary" type="submit">Save</button>
+     </div>
+    </div>
+   </fieldset>
+  </form>
+ </div>
 </div>

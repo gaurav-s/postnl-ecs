@@ -2,9 +2,13 @@
 
 Integrator plugin for PostNL ECS
 
+Release 2.1.7 - 16-02-2024
+
+- Added woocommerce logs for fetch error
+
 Release 2.1.6 - 09-02-2024
 
--  Resolved issue for XML Validation
+- Resolved issue for XML Validation
 
 Release 2.1.5 - 02-02-2024
 

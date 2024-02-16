@@ -1,164 +1,150 @@
-<?php 
-class ecsProductSettings {
-   
+<?php
+class ecsProductSettings
+{
     public static $instance;
-	
-	
-    
-	public static function init()
+
+    public static function init()
     {
-        if ( is_null( self::$instance ) )
+        if (is_null(self::$instance)) {
             self::$instance = new ecsProductSettings();
+        }
         return self::$instance;
     }
-    
-    private function __construct()
-    {
-     
-		
-    }
-    
+
     public function loadProductSettings($settingID)
     {
-    
-			// find list of states in DB
-			global $wpdb;
-			$table_name = $wpdb->prefix . 'ecsmeta';	
-			$qrymeta    = "SELECT * FROM $table_name " . "WHERE settingid = $settingID  ";
-			$statesmeta = $wpdb->get_results($qrymeta);
-			
-		return 	 $statesmeta; 
-	  
+        // find list of states in DB
+        global $wpdb;
+        $table_name = $wpdb->prefix . "ecsmeta";
+        $qrymeta = "SELECT * FROM $table_name " . "WHERE settingid = $settingID  ";
+        $statesmeta = $wpdb->get_results($qrymeta);
+        return $statesmeta;
     }
-    
-	  public function getSettingId()
+
+    public function getSettingId()
     {
-      
-		global $wpdb;
-		$table_name_ecs = $wpdb->prefix . 'ecs';
-		$qry            = "SELECT * FROM  	$table_name_ecs " . "WHERE keytext ='prductExport' ORDER BY id DESC  LIMIT 1 ";
-        $states         = $wpdb->get_results($qry);
-        $settingID      = '';
+        global $wpdb;
+        $table_name_ecs = $wpdb->prefix . "ecs";
+        $qry = "SELECT * FROM  	$table_name_ecs " ."WHERE keytext ='prductExport' ORDER BY id DESC  LIMIT 1 ";
+        $states = $wpdb->get_results($qry);
+        $settingID = "";
         foreach ($states as $k) {
             $settingID = $k->id;
         }
-		return 	  $settingID;
+        return $settingID;
     }
-	
-	 public function saveSettings()
+
+    public function saveSettings()
     {
-			global $wpdb;
-			$table_name_ecs = $wpdb->prefix . 'ecs';
-			$wpdb->insert($table_name_ecs, array(
-							'type' => '3',
-							'enable' => 'true',
-							'keytext' => 'prductExport' // ... and so on
-				));
-			$id         = $wpdb->insert_id;
-			return $id;
+        global $wpdb;
+        $table_name_ecs = $wpdb->prefix . "ecs";
+        $wpdb->insert($table_name_ecs, [
+            "type" => "3",
+            "enable" => "true",
+            "keytext" => "prductExport", // ... and so on
+        ]);
+        $id = $wpdb->insert_id;
+        return $id;
     }
-	
-	 public function saveSettingsValues($id,$keytext,$value)
+
+    public function saveSettingsValues($id, $keytext, $value)
     {
-			global $wpdb;
-			$table_name = $wpdb->prefix . 'ecsmeta';	
-			$wpdb->insert($table_name, array(
-							'settingid' => $id,
-							'keytext' => $keytext,
-							'value' => $value 
-						));
+        global $wpdb;
+        $table_name = $wpdb->prefix . "ecsmeta";
+        $wpdb->insert($table_name, [
+            "settingid" => $id,
+            "keytext" => $keytext,
+            "value" => $value,
+        ]);
     }
-	
-	public function updateSettingsValues($id,$value)
+
+    public function updateSettingsValues($id, $value)
     {
-			global $wpdb;
-			$table_name = $wpdb->prefix . 'ecsmeta';	
-			$wpdb->query($wpdb->prepare("UPDATE $table_name  SET value = '$value'
-	WHERE id= %d", $id));
+        global $wpdb;
+        $table_name = $wpdb->prefix . "ecsmeta";
+        $wpdb->query(
+            $wpdb->prepare(
+                "UPDATE $table_name  SET value = '$value' WHERE id= %d",
+                $id
+            )
+        );
     }
-    
-	public function getSettingValues($settingID)
+
+    public function getSettingValues($settingID)
     {
-			global $wpdb;
-			$table_name = $wpdb->prefix . 'ecsmeta';	
-			$qrymeta    = "SELECT * FROM $table_name " . "WHERE settingid = $settingID  ";
-						$statesmeta = $wpdb->get_results($qrymeta);
-						return $statesmeta;
+        global $wpdb;
+        $table_name = $wpdb->prefix . "ecsmeta";
+        $qrymeta = "SELECT * FROM $table_name " . "WHERE settingid = $settingID  ";
+        $statesmeta = $wpdb->get_results($qrymeta);
+        return $statesmeta;
     }
-	
-	
-    
-	public function displayProductExpSettings($Cron,$Path, $no,$ean_field   ) {
+
+    public function displayProductExpSettings($Cron, $Path, $no, $ean_field)
+    {
         //Path Field
-        echo    '<div class="form-group">
-                    <label class="col-md-4 control-label" for="textinput">Path</label>  
+        echo '<div class="form-group">
+                    <label class="col-md-4 control-label" for="textinput">Path</label>
                     <div class="col-md-4">
-                        <input id="textinput" name="Path" type="text" placeholder="Path" required="true" class="form-control input-md" value=' . $Path . '>
-                        <span class="help-block">For example /Products</span>  
+                        <input id="textinput" name="Path" type="text" placeholder="Path" required="true" class="form-control input-md" value=' .
+            $Path .
+            '>
+                        <span class="help-block">For example /Products</span>
                     </div>
                 </div>
                 ';
         //No of Products
-        echo    '<div class="form-group">
-                    <label class="col-md-4 control-label" for="textinput">Number of Products per file</label>  
+        echo '<div class="form-group">
+                    <label class="col-md-4 control-label" for="textinput">Number of Products per file</label>
                         <div class="col-md-4">
-                        <input id="textinput" name="no" type="number" placeholder="number" required="true" class="form-control input-md" value=' . $no . '>
-                        <span class="help-block">For example 3,5,10</span>  
+                        <input id="textinput" name="no" type="number" placeholder="number" required="true" class="form-control input-md" value=' .
+            $no .
+            '>
+                        <span class="help-block">For example 3,5,10</span>
                     </div>
                 </div>
                 ';
-        echo    '<div class="form-group">
-                <label class="col-md-4 control-label" for="textinput">Attribute code of EAN</label>  
+        echo '<div class="form-group">
+                <label class="col-md-4 control-label" for="textinput">Attribute code of EAN</label>
                     <div class="col-md-4">
-                    <input id="textinput" name="ean_attribute" type="text" placeholder="ean"  class="form-control input-md" value=' . $ean_field . '>
-                    <span class="help-block">For example ean</span>  
+                    <input id="textinput" name="ean_attribute" type="text" placeholder="ean"  class="form-control input-md" value=' .
+            $ean_field .
+            '>
+                    <span class="help-block">For example ean</span>
                 </div>
             </div>
             ';
-        
-
 
         postnlecs_cron_selection_display($Cron);
-        
+
         global $wpdb;
-        $table_name_ecs = $wpdb->prefix . 'ecs';
-        $querylast      = "SELECT * FROM $table_name_ecs " . "WHERE keytext = 'lastproductname'  ";
-        $statesmeta     = $wpdb->get_results($querylast);
-        $lastname       = '';
+        $table_name_ecs = $wpdb->prefix . "ecs";
+        $querylast = "SELECT * FROM $table_name_ecs " ."WHERE keytext = 'lastproductname'  ";
+        $statesmeta = $wpdb->get_results($querylast);
+
         if (count($statesmeta) > 0) {
             foreach ($statesmeta as $k) {
                 echo '<!-- Text input-->
                         <div class="form-group">
-                        <label class="col-md-4 control-label " for="textinput" style="cursor:default"> Last Processed File</label>  
+                        <label class="col-md-4 control-label " for="textinput" style="cursor:default"> Last Processed File</label>
                         <div class="col-md-4">
-                        <label class="col-md-4 control-label " for="textinput" style="cursor:default; padding-left:0px ; margin-left:0px ;" >' . $k->type . ' </label>  
-                        <span class="help-block"></span>  
+                        <label class="col-md-4 control-label " for="textinput" style="cursor:default; padding-left:0px ; margin-left:0px ;" >' .
+                    $k->type .
+                    ' </label>
+                        <span class="help-block"></span>
                         </div>
                         </div>';
             }
-        } 
-        else {
+        } else {
             echo '<!-- Text input-->
                 <div class="form-group">
-                <label class="col-md-4 control-label" for="textinput" style="cursor:default"> Last Processed File</label>  
+                <label class="col-md-4 control-label" for="textinput" style="cursor:default"> Last Processed File</label>
                 <div class="col-md-4">
-                <label class="col-md-4 control-label" for="textinput" style="cursor:default"> </label>  
-                <span class="help-block"></span>  
+                <label class="col-md-4 control-label" for="textinput" style="cursor:default"> </label>
+                <span class="help-block"></span>
                 </div>
                 </div>';
         }
-		
-	
-	
-	}
-	
-   
-    
-    
-
-
-
-
+    }
 }
 
 ?>

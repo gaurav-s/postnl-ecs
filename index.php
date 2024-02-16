@@ -3,7 +3,7 @@
 	Plugin Name: WooCommerce PostNL-Fulfilment
 	Plugin URI: http://www.postnl.nl/
 	Description: PostNL Fulfilment plugin for WooCommerce
-	Version: 2.1.6
+	Version: 2.1.7
 	Author: PostNL
 	Author URI: http://www.postnl.nl/
 	Text Domain: woocommercepostnlfulfillment
@@ -18,6 +18,7 @@
 
 	define('ECS_PATH', dirname(__FILE__));
 	define('ECS_DATA_PATH', ECS_PATH.'/data');
+	define('PLUGIN_PATH', untrailingslashit( plugin_dir_url( __FILE__ ) ) );
 
 	require_once("admin/partials/admin-display.php");
 
@@ -96,16 +97,4 @@
     function postnl_fulfillment_load_textdomain() {
         load_plugin_textdomain( 'woocommercepostnlfulfillment', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
     }
-
-
-
-
-
-
-
-
-
-
-
-
 ?>

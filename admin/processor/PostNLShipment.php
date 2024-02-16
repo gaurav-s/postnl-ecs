@@ -243,7 +243,7 @@ class PostNLShipment extends PostNLProcess
                                         update_post_meta($intOrder, 'exportedItems', $newExported);
                                     }
                                 } else {
-                                        add_post_meta($intOrder, 'exportedItems', $shippedOrders_ids, yes);
+                                        add_post_meta($intOrder, 'exportedItems', $shippedOrders_ids, true);
                                 }
                             }
 

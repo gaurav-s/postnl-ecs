@@ -109,10 +109,7 @@ class PostNLProcess
 	 * @param string $message Log message.
 	 * @param string $level Optional, defaults to info, valid levels: emergency|alert|critical|error|warning|notice|info|debug.
 	 */
-	public function log( $message, $level = 'debug' ) {
-		if ( ! Constants::is_true( 'WP_DEBUG' ) ) {
-			return;
-		}
+	public function log( $message, $level = 'error' ) {
 
         if ( ! function_exists( 'wc_get_logger' ) ) {
 			return;

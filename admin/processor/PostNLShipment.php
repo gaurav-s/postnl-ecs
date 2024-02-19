@@ -359,6 +359,7 @@ class PostNLShipment extends PostNLProcess
                             $Errors .= "<b>Message:</b><br>";
 
                             foreach ($inventory_errors as $fails) {
+                                 $this->log("An error occurred shipment processing file:". $fails);
                                 //error_log($fails);
                                 $Errors .= $fails;
                                 $Errors .= " <br>";

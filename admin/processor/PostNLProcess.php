@@ -38,6 +38,7 @@ class PostNLProcess
         }
 
         error_log("POSTNLECS: ERROR " . $ftpCheck[1]);
+        $this->log( "POSTNLECS: ERROR " . $ftpCheck[1], 'error' ) ;
         return false;
     }
 

@@ -67,6 +67,8 @@ function postnlecs_cron_order_export()
         $postnlOrder = new PostNLOrder();
         $postnlOrder->processOrders();
     } catch (Exception $e) {
+        $log = wc_get_logger();
+		$log->log( 'error', $e->getMessage(), array( 'source' => 'postnl_fullfillment' ) );
     }
 }
 
@@ -76,6 +78,8 @@ function postnlecs_cron_product_export()
         $postnlproduct = new PostNLProduct();
         $postnlproduct->processProducts();
     } catch (Exception $e) {
+        $log = wc_get_logger();
+		$log->log( 'error', $e->getMessage(), array( 'source' => 'postnl_fullfillment' ) );
     }
 }
 
@@ -85,6 +89,8 @@ function postnlecs_cron_shipment_import()
         $postnlshipment = new PostNLShipment();
         $postnlshipment->processShipment();
     } catch (Exception $e) {
+        $log = wc_get_logger();
+		$log->log( 'error', $e->getMessage(), array( 'source' => 'postnl_fullfillment' ) );
     }
 }
 
@@ -94,6 +100,8 @@ function postnlecs_cron_inventory_import()
         $postnlStock = new PostNLStock();
         $postnlStock->processStock();
     } catch (Exception $e) {
+        $log = wc_get_logger();
+		$log->log( 'error', $e->getMessage(), array( 'source' => 'postnl_fullfillment' ) );
     }
 }
 

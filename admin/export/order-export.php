@@ -113,6 +113,7 @@
                     "Shipping",
                     $Shipping
                 );
+                $EcsOrderSettings->saveSettingsValues($id, "no", $no);
                 $EcsOrderSettings->saveSettingsValues($id, "Path", $Path);
                 $EcsOrderSettings->saveSettingsValues($id, "Status", $Status);
                 $EcsOrderSettings->saveSettingsValues(

@@ -2,6 +2,10 @@
 
 Integrator plugin for PostNL ECS
 
+Release 2.1.71 - 26-02-2024
+
+- This plugin is compatible with PHP version 8.1 and Woocommerce version 8.6.1.
+
 Release 2.1.7 - 16-02-2024
 
 - Added woocommerce logs for fetch error

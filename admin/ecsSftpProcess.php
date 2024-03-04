@@ -15,14 +15,9 @@ class ecsSftpProcess
         return self::$instance;
     }
 
-    private function __construct()
-    {
-    }
-
     public function checkSftpSettings($checkpath)
     {
         global $wpdb;
-        $table_name_ecs = $wpdb->prefix . "ecs";
         $table_name = $wpdb->prefix . "ecsmeta";
 
         $settingID = $this->getSettingId();
@@ -31,8 +26,7 @@ class ecsSftpProcess
         $message = "";
 
         if (!empty($settingID)) {
-            $qrymeta =
-                "SELECT * FROM $table_name " . "WHERE settingid = $settingID  ";
+            $qrymeta = "SELECT * FROM $table_name " . "WHERE settingid = $settingID  ";
             $statesmeta = $wpdb->get_results($qrymeta);
             foreach ($statesmeta as $k) {
                 if ($k->keytext == "PrivateKey") {
@@ -58,8 +52,6 @@ class ecsSftpProcess
 
             $key = RSA::loadPrivateKey($pass);
             $ssh = new SSH2($host);
-            $local_directory = "test2.xml";
-            $remote_directory = "/woocommerce_test/Order/";
             $sftp = new SFTP($host);
 
             if (!$sftp->login($user, $key) || !$ssh->login($user, $key)) {
@@ -88,30 +80,19 @@ class ecsSftpProcess
         }
     }
 
-    public function checkFtpLogin()
-    {
-    }
-
     public function getkeyFile($pass)
     {
         if (!file_exists(dirname(__DIR__) . "/data")) {
             mkdir(dirname(__DIR__) . "/data", 0777, true);
         }
         $keyFile = dirname(__DIR__) . "/data/private3.ppk";
-        //$myfile = fopen($keyFile,'w') or die("Unable to open file!");
-        //$txt = $pass;
-        //fwrite($myfile, $txt);
-        //fclose($myfile);
         return $keyFile;
     }
     public function getSettingId()
     {
         global $wpdb;
         $table_name_ecs = $wpdb->prefix . "ecs";
-        $table_name = $wpdb->prefix . "ecsmeta";
-        $qry =
-            "SELECT * FROM $table_name_ecs " .
-            "WHERE keytext ='sftp' ORDER BY id DESC LIMIT 1 ";
+        $qry = "SELECT * FROM $table_name_ecs " ."WHERE keytext ='sftp' ORDER BY id DESC LIMIT 1 ";
         $states = $wpdb->get_results($qry);
         $settingID = "";
         foreach ($states as $k) {
@@ -125,8 +106,7 @@ class ecsSftpProcess
     {
         global $wpdb;
         $table_name = $wpdb->prefix . "ecsmeta";
-        $qrymeta =
-            "SELECT * FROM $table_name " . "WHERE settingid = $settingID  ";
+        $qrymeta = "SELECT * FROM $table_name " . "WHERE settingid = $settingID  ";
         $statesmeta = $wpdb->get_results($qrymeta);
 
         return $statesmeta;
@@ -161,11 +141,7 @@ class ecsSftpProcess
         global $wpdb;
         $table_name = $wpdb->prefix . "ecsmeta";
         $wpdb->query(
-            $wpdb->prepare(
-                "UPDATE $table_name  SET value = '$value'
-	WHERE id= %d",
-                $id
-            )
+            $wpdb->prepare("UPDATE $table_name  SET value = '$value' WHERE id= %d", $id)
         );
     }
 
@@ -173,8 +149,7 @@ class ecsSftpProcess
     {
         global $wpdb;
         $table_name = $wpdb->prefix . "ecsmeta";
-        $qrymeta =
-            "SELECT * FROM $table_name " . "WHERE settingid = $settingID  ";
+        $qrymeta = "SELECT * FROM $table_name " . "WHERE settingid = $settingID  ";
         $statesmeta = $wpdb->get_results($qrymeta);
         return $statesmeta;
     }

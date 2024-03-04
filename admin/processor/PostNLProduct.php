@@ -1,178 +1,240 @@
 <?php
 class PostNLProduct extends PostNLProcess
 {
-    const EAN_ARRAY = [
-        'ean',
-        'ean-no',
-        'eanNo',
-        'ean-13',
-        'eanno'
-    ];
-
-    public function __construct() {
-
-    }
+    const EAN_ARRAY = ["ean", "ean-no", "eanNo", "ean-13", "eanno"];
 
     public function processProducts()
     {
+        try {
+            $EcsProductSettings = ecsProductSettings::init();
 
+            $Path = "";
 
-        $EcsSftpSettings = $this->getFtpSettings();
+            $eanAttribute = "";
+            $settingID = $EcsProductSettings->getSettingId();
 
-        $EcsProductSettings = ecsProductSettings::init();
-
-        $Path = '';
-
-        $eanAttribute = '';
-        $settingID = $EcsProductSettings->getSettingId();
-
-        if ($settingID)
-            $statesmeta = $EcsProductSettings->loadProductSettings($settingID);
-        else {
-            error_log('Product settings not found');
-            return;
-        }
-
-        foreach ($statesmeta as $k) {
-
-            if ($k->keytext == "Path") {
-                $Path = $k->value;
+            if ($settingID) {
+                $statesmeta = $EcsProductSettings->loadProductSettings(
+                    $settingID
+                );
+            } else {
+                $this->log("Product settings not found");
+                return;
             }
 
-            if ($k->keytext == "no") {
-                $no = $k->value;
+            foreach ($statesmeta as $k) {
+                if ($k->keytext == "Path") {
+                    $Path = $k->value;
+                }
+
+                if ($k->keytext == "no") {
+                    $no = $k->value;
+                }
+
+                if ($k->keytext == "ean_attribute") {
+                    $eanAttribute = trim($k->value);
+                }
             }
 
-            if ($k->keytext == "ean_attribute") {
-                $eanAttribute = trim($k->value);
+            $eanAttribute = empty($eanAttribute)
+                ? "ean"
+                : strtolower($eanAttribute);
+
+            $sftp = $this->checkFtpSettings($Path);
+
+            if (!$sftp) {
+                return false;
             }
-        }
 
-        $eanAttribute = empty($eanAttribute) ? 'ean' : strtolower($eanAttribute) ;
+            global $wpdb;
+            $table_name_ecs = $wpdb->prefix . "ecs";
+            $qrymeta = "SELECT * FROM $table_name_ecs " ."WHERE keytext = 'LastproductID'  ";
+            $statesmeta = $wpdb->get_results($qrymeta);
+            $orderNo = "0";
 
-        $sftp = $this->checkFtpSettings($Path);
-
-        if(!$sftp)
-            return false;
-
-
-        $lastfile = '';
-
-        global $wpdb;
-        $table_name_ecs = $wpdb->prefix . 'ecs';
-        $qrymeta = "SELECT * FROM $table_name_ecs " . "WHERE keytext = 'LastproductID'  ";
-        $statesmeta = $wpdb->get_results($qrymeta);
-        $orderNo = '0';
-
-        foreach($statesmeta as $k) {
-            $orderNo = $k->type;
-            $NextorderNo = $orderNo + 1;
-            $wpdb->query($wpdb->prepare("UPDATE $table_name_ecs SET type = '".$NextorderNo."' WHERE  id= %d", $k->id));
-        }
-
-        $xml = new DOMDocument();
-        $message = $xml->createElementNS("http://www.toppak.nl/item", 'message');
-        $xml->appendChild($message);
-        $message->appendChild($xml->createElementNS("http://www.toppak.nl/item",'type', 'item'));
-        $message->appendChild($xml->createElementNS("http://www.toppak.nl/item",'messageNo', $orderNo));
-
-        $t = time();
-        $message->appendChild($xml->createElementNS("http://www.toppak.nl/item",'date', date("Y-m-d", $t)));
-        $message->appendChild($xml->createElementNS("http://www.toppak.nl/item",'time', date("H:i:s", $t)));
-
-        $products = $xml->createElementNS("http://www.toppak.nl/item",'items');
-        $message->appendChild($products);
-        $Products = get_posts(
-            array(
-                'post_type' => array('product','product_variation'),
-                //'post_status' => wc_get_order_statuses(), //get all available order statuses in an array
-                'posts_per_page' => 100,
-                'meta_query' => array(
-                    array(
-                        'key' => 'ecsExport',
-                        'compare' => 'NOT EXISTS'
+            foreach ($statesmeta as $k) {
+                $orderNo = $k->type;
+                $NextorderNo = $orderNo + 1;
+                $wpdb->query(
+                    $wpdb->prepare(
+                        "UPDATE $table_name_ecs SET type = '" .
+                            $NextorderNo .
+                            "' WHERE  id= %d",
+                        $k->id
                     )
+                );
+            }
+
+            $xml = new DOMDocument();
+            $message = $xml->createElementNS(
+                "http://www.toppak.nl/item",
+                "message"
+            );
+            $xml->appendChild($message);
+            $message->appendChild(
+                $xml->createElementNS(
+                    "http://www.toppak.nl/item",
+                    "type",
+                    "item"
                 )
-            )
-        );
+            );
+            $message->appendChild(
+                $xml->createElementNS(
+                    "http://www.toppak.nl/item",
+                    "messageNo",
+                    $orderNo
+                )
+            );
 
-        $result = count($Products);
+            $t = time();
+            $message->appendChild(
+                $xml->createElementNS(
+                    "http://www.toppak.nl/item",
+                    "date",
+                    date("Y-m-d", $t)
+                )
+            );
+            $message->appendChild(
+                $xml->createElementNS(
+                    "http://www.toppak.nl/item",
+                    "time",
+                    date("H:i:s", $t)
+                )
+            );
 
-        if(!$result)
-            return false;
+            $products = $xml->createElementNS(
+                "http://www.toppak.nl/item",
+                "items"
+            );
+            $message->appendChild($products);
+            $Products = get_posts([
+                "post_type" => ["product", "product_variation"],
+                //'post_status' => wc_get_order_statuses(), //get all available order statuses in an array
+                "posts_per_page" => 100,
+                "meta_query" => [
+                    [
+                        "key" => "ecsExport",
+                        "compare" => "NOT EXISTS",
+                    ],
+                ],
+            ]);
 
-        $Productchunck = array_chunk($Products, $no);
-        $FailedOrders = array();
+            $result = count($Products);
 
-        foreach($Productchunck as $Product_split) {
-            $isEmpty = 0;
+            if (!$result) {
+                return false;
+            }
 
-            foreach($Product_split as $productPostItem) {
-                $product_id = $productPostItem->ID;
+            $Productchunck = array_chunk($Products, $no);
+            $FailedOrders = [];
 
-                $isvalidate = true;
-                $failed = new Failederrors();
-                $failed->set_orderID($product_id);
-                $productpost = $productPostItem;
-                //$product = new WC_Product($product_id);
+            foreach ($Productchunck as $Product_split) {
+                $isEmpty = 0;
 
-                if($productPostItem->post_type == 'product_variation') {
-                    $product = new WC_Product_Variation($product_id);
-                }
-                else {
+                foreach ($Product_split as $productPostItem) {
+                    $product_id = $productPostItem->ID;
+
+                    $isvalidate = true;
+                    $failed = new Failederrors();
+                    $failed->set_orderID($product_id);
+                    $productpost = $productPostItem;
                     //$product = new WC_Product($product_id);
-                    $product = wc_get_product($product_id);
 
-                    if($product->is_type('variable'))
-                        continue;
-
-                    if($product->is_downloadable())
-                        continue;
-
-                    if($product->is_virtual())
-                        continue;
-                }
-
-                $node = $xml->createElementNS("http://www.toppak.nl/item",'item');
-
-                //SKU
-                if(strlen($product->get_sku()) == 0) {
-                    $failed->addError(" itemNo length is null");
-                    $isvalidate = false;
-                } else {
-                    if(strlen($product->get_sku()) > 24) {
-                        $failed->addError(" itemNo length is greater than 24 characters");
-                        $isvalidate = false;
-
-                    }
-                }
-
-                $node->appendChild($xml->createElementNS("http://www.toppak.nl/item",'itemNo', $product->get_sku()));
-
-
-                //DESCRIPTION
-
-                if(strlen($product->get_title()) == 0) {
-                    $failed->addError(" description length is null");
-                    $isvalidate = false;
-                } else {
-                    $description2 = '';
-                    if(strlen($product->get_title()) > 30) {
-                        $description2 = substr($product->get_title(), 30,30);
-                        //split in two
-                        $node->appendChild($xml->createElementNS("http://www.toppak.nl/item",'description', substr($product->get_title(), 0, 30)));
-
-                        $node->appendChild($xml->createElementNS("http://www.toppak.nl/item",'description2', $description2));
+                    if ($productPostItem->post_type == "product_variation") {
+                        $product = new WC_Product_Variation($product_id);
                     } else {
-                        //split in two
-                        $node->appendChild($xml->createElementNS("http://www.toppak.nl/item",'description', $product->get_title()));
-                        $node->appendChild($xml->createElementNS("http://www.toppak.nl/item",'description2', ''));
+                        //$product = new WC_Product($product_id);
+                        $product = wc_get_product($product_id);
+
+                        if ($product->is_type("variable")) {
+                            continue;
+                        }
+
+                        if ($product->is_downloadable()) {
+                            continue;
+                        }
+
+                        if ($product->is_virtual()) {
+                            continue;
+                        }
                     }
-                }
 
+                    $node = $xml->createElementNS(
+                        "http://www.toppak.nl/item",
+                        "item"
+                    );
 
-                //ATTRIBUTES - NOT REQUIRED
-                /*if($product->is_type('variation')) {
+                    //SKU
+                    if (strlen($product->get_sku()) == 0) {
+                        $failed->addError(" itemNo length is null");
+                        $isvalidate = false;
+                    } else {
+                        if (strlen($product->get_sku()) > 24) {
+                            $failed->addError(
+                                " itemNo length is greater than 24 characters"
+                            );
+                            $isvalidate = false;
+                        }
+                    }
+
+                    $node->appendChild(
+                        $xml->createElementNS(
+                            "http://www.toppak.nl/item",
+                            "itemNo",
+                            $product->get_sku()
+                        )
+                    );
+
+                    //DESCRIPTION
+
+                    if (strlen($product->get_title()) == 0) {
+                        $failed->addError(" description length is null");
+                        $isvalidate = false;
+                    } else {
+                        $description2 = "";
+                        if (strlen($product->get_title()) > 30) {
+                            $description2 = substr(
+                                $product->get_title(),
+                                30,
+                                30
+                            );
+                            //split in two
+                            $node->appendChild(
+                                $xml->createElementNS(
+                                    "http://www.toppak.nl/item",
+                                    "description",
+                                    substr($product->get_title(), 0, 30)
+                                )
+                            );
+
+                            $node->appendChild(
+                                $xml->createElementNS(
+                                    "http://www.toppak.nl/item",
+                                    "description2",
+                                    $description2
+                                )
+                            );
+                        } else {
+                            //split in two
+                            $node->appendChild(
+                                $xml->createElementNS(
+                                    "http://www.toppak.nl/item",
+                                    "description",
+                                    $product->get_title()
+                                )
+                            );
+                            $node->appendChild(
+                                $xml->createElementNS(
+                                    "http://www.toppak.nl/item",
+                                    "description2",
+                                    ""
+                                )
+                            );
+                        }
+                    }
+
+                    //ATTRIBUTES - NOT REQUIRED
+                    /*if($product->is_type('variation')) {
                     $attributes = $product->get_attributes();
                     $parentData = $product->get_parent_data();
 
@@ -182,308 +244,528 @@ class PostNLProduct extends PostNLProcess
                     $attributes = $product->get_attributes();
                 */
 
+                    //ATTRIBUTES ADD
+                    $unitOfMeasure = $product->get_attribute("unitOfMeasure")
+                        ? $product->get_attribute("unitOfMeasure")
+                        : "";
 
+                    $vendorItemNo = $product->get_attribute("vendorItemNo")
+                        ? $product->get_attribute("vendorItemNo")
+                        : "";
+                    $bac = $product->get_attribute("bac")
+                        ? $product->get_attribute("bac")
+                        : "";
+                    $validFrom = $product->get_attribute("validFrom")
+                        ? $product->get_attribute("validFrom")
+                        : "";
+                    $validTo = $product->get_attribute("validTo")
+                        ? $product->get_attribute("validTo")
+                        : "";
+                    $adr = $product->get_attribute("adr")
+                        ? $product->get_attribute("adr")
+                        : "";
+                    $lot = $product->get_attribute("lot")
+                        ? $product->get_attribute("lot")
+                        : "";
+                    $sortOrder = $product->get_attribute("sortorder")
+                        ? $product->get_attribute("sortorder")
+                        : "";
+                    $minStock = $product->get_attribute("minstock")
+                        ? $product->get_attribute("minstock")
+                        : "";
+                    $maxStock = $product->get_attribute("maxstock")
+                        ? $product->get_attribute("maxstock")
+                        : "";
+                    $productType = $product->get_attribute("product-type")
+                        ? $product->get_attribute("product-type")
+                        : "";
 
-                //ATTRIBUTES ADD
-                $unitOfMeasure = $product->get_attribute('unitOfMeasure') ? $product->get_attribute('unitOfMeasure') : '';
+                    //if plugin for EAN is installed use it https://wordpress.org/plugins/product-gtin-ean-upc-isbn-for-woocommerce/
+                    $eanNo = $product->get_meta("_wpm_gtin_code")
+                        ? $product->get_meta("_wpm_gtin_code")
+                        : "";
+                    //else use default functionality with EAN as custom attribute
+                    if (strlen($eanNo) == 0) {
+                        $eanNo = $product->get_attribute($eanAttribute)
+                            ? $product->get_attribute($eanAttribute)
+                            : "";
+                    }
 
-                $vendorItemNo = $product->get_attribute('vendorItemNo') ? $product->get_attribute('vendorItemNo') : '';
-                $bac = $product->get_attribute('bac') ? $product->get_attribute('bac') : '';
-                $validFrom = $product->get_attribute('validFrom') ? $product->get_attribute('validFrom') : '';
-                $validTo = $product->get_attribute('validTo') ? $product->get_attribute('validTo') : '';
-                $adr = $product->get_attribute('adr') ? $product->get_attribute('adr') : '';
-                $lot = $product->get_attribute('lot') ? $product->get_attribute('lot') : '';
-                $sortOrder = $product->get_attribute('sortorder') ? $product->get_attribute('sortorder') : '';
-                $minStock = $product->get_attribute('minstock') ? $product->get_attribute('minstock') : '';
-                $maxStock = $product->get_attribute('maxstock') ? $product->get_attribute('maxstock') : '';
-                $productType = $product->get_attribute('product-type') ? $product->get_attribute('product-type') : '';
-
-                //if plugin for EAN is installed use it https://wordpress.org/plugins/product-gtin-ean-upc-isbn-for-woocommerce/
-                $eanNo = $product->get_meta('_wpm_gtin_code') ? $product->get_meta('_wpm_gtin_code') : '';
-                //else use default functionality with EAN as custom attribute
-                if(strlen($eanNo) == 0) {
-                    $eanNo = $product->get_attribute($eanAttribute) ? $product->get_attribute($eanAttribute) : '';
-                }
-
-
-                /*foreach(self::EAN_ARRAY as $ean_search){
+                    /*foreach(self::EAN_ARRAY as $ean_search){
                     if (array_key_exists($ean_search, $attributes))
                         $eanNo = $attributes[$ean_search];
                     }*/
 
-                //UOM
-                if(strlen($unitOfMeasure) > 10) {
-                    $failed->addError(" unitOfMeasure length is greater than 10 characters");
-                    $isvalidate = false;
-                }
-
-                if(strlen($unitOfMeasure) == 0) {
-                    $node->appendChild($xml->createElementNS("http://www.toppak.nl/item",'unitOfMeasure', 'ST'));
-                } else {
-                    $node->appendChild($xml->createElementNS("http://www.toppak.nl/item",'unitOfMeasure', $unitOfMeasure));
-                }
-
-                //HEIGHT
-                $height = $product->get_height();
-                if(strlen($product->get_height()) == 0) {
-                    $height = 1;
-                } else {
-                    if(strlen($product->get_height()) > 255) {
-                        $failed->addError(" height length is greater than 255 characters");
+                    //UOM
+                    if (strlen($unitOfMeasure) > 10) {
+                        $failed->addError(
+                            " unitOfMeasure length is greater than 10 characters"
+                        );
                         $isvalidate = false;
                     }
-                }
-                $node->appendChild($xml->createElementNS("http://www.toppak.nl/item",'height', $height));
 
-                //WIDTH
-                $width = $product->get_width();
-                if(strlen($product->get_width()) == 0) {
-                    $width = 1;
-                } else {
-                    if(strlen($product->get_width()) > 255) {
-                        $failed->addError(" width length is greater than 255 characters");
-                        $isvalidate = false;
-                    }
-                }
-                $node->appendChild($xml->createElementNS("http://www.toppak.nl/item",'width', $width));
-
-                //LENGTH
-                $length = $product->get_length();
-                if(strlen($product->get_length()) == 0) {
-                    $length = 1;
-                } else {
-                    if (strlen($product->get_length()) > 255) {
-                        $failed->addError(" Product length length is greater than 255 characters");
-                        $isvalidate = false;
-                    }
-                }
-                $node->appendChild($xml->createElementNS("http://www.toppak.nl/item",'depth', $length));
-
-                //WEIGHT
-                $weight = $product->get_weight();
-                if(strlen($product->get_weight()) == 0) {
-                    $weight = 1;
-                } else {
-                    if (strlen($product->get_weight()) > 255) {
-                        $failed->addError(" Product weight length is greater than 255 characters");
-                        $isvalidate = false;
-                    }
-                }
-                $node->appendChild($xml->createElementNS("http://www.toppak.nl/item",'weight', $weight));
-
-                //VENDOR ITEM
-                if(strlen($vendorItemNo) > 30) {
-                    $failed->addError(" vendorItemNo length is greater than 30 characters");
-                    $isvalidate = false;
-                }
-                $node->appendChild($xml->createElementNS("http://www.toppak.nl/item",'vendorItemNo', $vendorItemNo));
-
-                //EAN
-                if(strlen($eanNo) == 0) {
-                    $eanNo = $product->get_sku();
-                }
-
-                if(strlen($eanNo) > 15) {
-                    $failed->addError(" eanNo length is greater than 15 characters");
-                    $isvalidate = false;
-                }
-                $node->appendChild($xml->createElementNS("http://www.toppak.nl/item",'eanNo', $eanNo));
-
-                //BAC
-                if(strlen($bac) > 255) {
-                    $failed->addError(" bac length is greater than 255 characters");
-                    $isvalidate = false;
-                }
-                $node->appendChild($xml->createElementNS("http://www.toppak.nl/item",'bac', $bac));
-
-                //OTHER attributes
-                $node->appendChild($xml->createElementNS("http://www.toppak.nl/item",'validFrom', $validFrom));
-                $node->appendChild($xml->createElementNS("http://www.toppak.nl/item",'validTo', $validTo));
-                $node->appendChild($xml->createElementNS("http://www.toppak.nl/item",'expiry', 'false'));
-                $node->appendChild($xml->createElementNS("http://www.toppak.nl/item",'adr', $adr));
-                $node->appendChild($xml->createElementNS("http://www.toppak.nl/item",'active', 'true'));
-                $node->appendChild($xml->createElementNS("http://www.toppak.nl/item",'lot', $lot));
-                $node->appendChild($xml->createElementNS("http://www.toppak.nl/item",'sortOrder', $sortOrder));
-                $node->appendChild($xml->createElementNS("http://www.toppak.nl/item",'minStock', $minStock));
-                $node->appendChild($xml->createElementNS("http://www.toppak.nl/item",'maxStock', $maxStock));
-                $node->appendChild($xml->createElementNS("http://www.toppak.nl/item",'retailPrice', $this->formatnumber($product->get_regular_price())));
-
-                //PURCHASE PRICE
-                if(strlen($product->get_sale_price()) == 0) {
-                    $node->appendChild($xml->createElementNS("http://www.toppak.nl/item",'purchasePrice', $this->formatnumber($product->get_regular_price())));
-                } else {
-                    $node->appendChild($xml->createElementNS("http://www.toppak.nl/item",'purchasePrice', $this->formatnumber($product->get_sale_price())));
-                }
-
-                //PRODUCT TYPE
-                if(strlen($productType) > 255) {
-                    $failed->addError(" Product Type length is greater than 255 characters");
-                    $isvalidate = false;
-
-                }
-                $node->appendChild($xml->createElementNS("http://www.toppak.nl/item",'productType', $productType));
-
-                //MASTER PRODUCT
-                $node->appendChild($xml->createElementNS("http://www.toppak.nl/item",'defaultMasterProduct', 'false'));
-
-                //HANGING STORAGE
-                $node->appendChild($xml->createElementNS("http://www.toppak.nl/item",'hangingStorage', 'false'));
-
-                //BACKORDERS
-                $back = $product->get_backorders();
-                if(strcmp($back, "no") != 0) {
-                    $back = 'true';
-                } else {
-                    $back = 'false';
-                }
-                $node->appendChild($xml->createElementNS("http://www.toppak.nl/item",'backOrder', $back));
-
-                //ENRICHED
-                $node->appendChild($xml->createElementNS("http://www.toppak.nl/item",'enriched', 'true'));
-
-
-                if($isvalidate == true) {
-                    $products->appendChild($node);
-                    add_post_meta($product_id, 'ecsExport', 'yes');
-                    $isEmpty = $isEmpty + 1;
-                } else {
-                    array_push($FailedOrders, $failed);
-                }
-
-
-
-                if($isEmpty > 0) { //Export products
-                    $t = time();
-                    $filename = 'PRD' . date("YmdHis", $t) . '.xml';
-
-                    $message->appendChild($products);
-                    $xml->appendChild($message);
-
-                    //Remove Empty fields:
-                    $xpath = new DOMXPath($xml);
-
-                    while (($node_list = $xpath->query('//*[not(*) and not(@*) and not(text()[normalize-space()])]')) && $node_list->length) {
-                        foreach ($node_list as $node) {
-                            $node->parentNode->removeChild($node);
-                        }
-                    }
-
-                    $xml->formatOutput = true;
-
-                    //Check XSD:
-                    $is_valid_xml = true;
-
-
-                    if(function_exists('libxml_use_internal_errors'))
-                        libxml_use_internal_errors(true);
-
-                    if(file_exists(__DIR__.DIRECTORY_SEPARATOR.'schema'.DIRECTORY_SEPARATOR."item.xsd")) {
-
-                        $is_valid_xml = $xml->schemaValidate(__DIR__.DIRECTORY_SEPARATOR.'schema'.DIRECTORY_SEPARATOR."item.xsd");
-
-                    }
-
-
-                    if( !$is_valid_xml) {
-
-                        $validationError = '';
-
-                        if(function_exists('libxml_use_internal_errors')) {
-                            $errors = libxml_get_errors();
-                            foreach ($errors as $error) {
-                                $validationError = $validationError.sprintf('XML error "%s" [%d] (Code %d) in %s on line %d column %d' . "\n",
-                                        $error->message, $error->level, $error->code, $error->file,
-                                        $error->line, $error->column);
-                            }
-
-                            libxml_clear_errors();
-                            libxml_use_internal_errors(false);
-
-                        }
-
-                        $failed = new Failederrors();
-                        $failed->set_orderID('');
-
-                        $failed->addError(" Product XML is invalid: ".$validationError);
-
-                        array_push($FailedOrders, $failed);
-
+                    if (strlen($unitOfMeasure) == 0) {
+                        $node->appendChild(
+                            $xml->createElementNS(
+                                "http://www.toppak.nl/item",
+                                "unitOfMeasure",
+                                "ST"
+                            )
+                        );
                     } else {
+                        $node->appendChild(
+                            $xml->createElementNS(
+                                "http://www.toppak.nl/item",
+                                "unitOfMeasure",
+                                $unitOfMeasure
+                            )
+                        );
+                    }
 
-                        if(function_exists('libxml_use_internal_errors')) {
-                            libxml_clear_errors();
-                            libxml_use_internal_errors(false);
+                    //HEIGHT
+                    $height = $product->get_height();
+                    if (strlen($product->get_height()) == 0) {
+                        $height = 1;
+                    } else {
+                        if (strlen($product->get_height()) > 255) {
+                            $failed->addError(
+                                " height length is greater than 255 characters"
+                            );
+                            $isvalidate = false;
+                        }
+                    }
+                    $node->appendChild(
+                        $xml->createElementNS(
+                            "http://www.toppak.nl/item",
+                            "height",
+                            $height
+                        )
+                    );
+
+                    //WIDTH
+                    $width = $product->get_width();
+                    if (strlen($product->get_width()) == 0) {
+                        $width = 1;
+                    } else {
+                        if (strlen($product->get_width()) > 255) {
+                            $failed->addError(
+                                " width length is greater than 255 characters"
+                            );
+                            $isvalidate = false;
+                        }
+                    }
+                    $node->appendChild(
+                        $xml->createElementNS(
+                            "http://www.toppak.nl/item",
+                            "width",
+                            $width
+                        )
+                    );
+
+                    //LENGTH
+                    $length = $product->get_length();
+                    if (strlen($product->get_length()) == 0) {
+                        $length = 1;
+                    } else {
+                        if (strlen($product->get_length()) > 255) {
+                            $failed->addError(
+                                " Product length length is greater than 255 characters"
+                            );
+                            $isvalidate = false;
+                        }
+                    }
+                    $node->appendChild(
+                        $xml->createElementNS(
+                            "http://www.toppak.nl/item",
+                            "depth",
+                            $length
+                        )
+                    );
+
+                    //WEIGHT
+                    $weight = $product->get_weight();
+                    if (strlen($product->get_weight()) == 0) {
+                        $weight = 1;
+                    } else {
+                        if (strlen($product->get_weight()) > 255) {
+                            $failed->addError(
+                                " Product weight length is greater than 255 characters"
+                            );
+                            $isvalidate = false;
+                        }
+                    }
+                    $node->appendChild(
+                        $xml->createElementNS(
+                            "http://www.toppak.nl/item",
+                            "weight",
+                            $weight
+                        )
+                    );
+
+                    //VENDOR ITEM
+                    if (strlen($vendorItemNo) > 30) {
+                        $failed->addError(
+                            " vendorItemNo length is greater than 30 characters"
+                        );
+                        $isvalidate = false;
+                    }
+                    $node->appendChild(
+                        $xml->createElementNS(
+                            "http://www.toppak.nl/item",
+                            "vendorItemNo",
+                            $vendorItemNo
+                        )
+                    );
+
+                    //EAN
+                    if (strlen($eanNo) == 0) {
+                        $eanNo = $product->get_sku();
+                    }
+
+                    if (strlen($eanNo) > 15) {
+                        $failed->addError(
+                            " eanNo length is greater than 15 characters"
+                        );
+                        $isvalidate = false;
+                    }
+                    $node->appendChild(
+                        $xml->createElementNS(
+                            "http://www.toppak.nl/item",
+                            "eanNo",
+                            $eanNo
+                        )
+                    );
+
+                    //BAC
+                    if (strlen($bac) > 255) {
+                        $failed->addError(
+                            " bac length is greater than 255 characters"
+                        );
+                        $isvalidate = false;
+                    }
+                    $node->appendChild(
+                        $xml->createElementNS(
+                            "http://www.toppak.nl/item",
+                            "bac",
+                            $bac
+                        )
+                    );
+
+                    //OTHER attributes
+                    $node->appendChild(
+                        $xml->createElementNS(
+                            "http://www.toppak.nl/item",
+                            "validFrom",
+                            $validFrom
+                        )
+                    );
+                    $node->appendChild(
+                        $xml->createElementNS(
+                            "http://www.toppak.nl/item",
+                            "validTo",
+                            $validTo
+                        )
+                    );
+                    $node->appendChild(
+                        $xml->createElementNS(
+                            "http://www.toppak.nl/item",
+                            "expiry",
+                            "false"
+                        )
+                    );
+                    $node->appendChild(
+                        $xml->createElementNS(
+                            "http://www.toppak.nl/item",
+                            "adr",
+                            $adr
+                        )
+                    );
+                    $node->appendChild(
+                        $xml->createElementNS(
+                            "http://www.toppak.nl/item",
+                            "active",
+                            "true"
+                        )
+                    );
+                    $node->appendChild(
+                        $xml->createElementNS(
+                            "http://www.toppak.nl/item",
+                            "lot",
+                            $lot
+                        )
+                    );
+                    $node->appendChild(
+                        $xml->createElementNS(
+                            "http://www.toppak.nl/item",
+                            "sortOrder",
+                            $sortOrder
+                        )
+                    );
+                    $node->appendChild(
+                        $xml->createElementNS(
+                            "http://www.toppak.nl/item",
+                            "minStock",
+                            $minStock
+                        )
+                    );
+                    $node->appendChild(
+                        $xml->createElementNS(
+                            "http://www.toppak.nl/item",
+                            "maxStock",
+                            $maxStock
+                        )
+                    );
+                    $node->appendChild(
+                        $xml->createElementNS(
+                            "http://www.toppak.nl/item",
+                            "retailPrice",
+                            $this->formatnumber($product->get_regular_price())
+                        )
+                    );
+
+                    //PURCHASE PRICE
+                    if (strlen($product->get_sale_price()) == 0) {
+                        $node->appendChild(
+                            $xml->createElementNS(
+                                "http://www.toppak.nl/item",
+                                "purchasePrice",
+                                $this->formatnumber(
+                                    $product->get_regular_price()
+                                )
+                            )
+                        );
+                    } else {
+                        $node->appendChild(
+                            $xml->createElementNS(
+                                "http://www.toppak.nl/item",
+                                "purchasePrice",
+                                $this->formatnumber($product->get_sale_price())
+                            )
+                        );
+                    }
+
+                    //PRODUCT TYPE
+                    if (strlen($productType) > 255) {
+                        $failed->addError(
+                            " Product Type length is greater than 255 characters"
+                        );
+                        $isvalidate = false;
+                    }
+                    $node->appendChild(
+                        $xml->createElementNS(
+                            "http://www.toppak.nl/item",
+                            "productType",
+                            $productType
+                        )
+                    );
+
+                    //MASTER PRODUCT
+                    $node->appendChild(
+                        $xml->createElementNS(
+                            "http://www.toppak.nl/item",
+                            "defaultMasterProduct",
+                            "false"
+                        )
+                    );
+
+                    //HANGING STORAGE
+                    $node->appendChild(
+                        $xml->createElementNS(
+                            "http://www.toppak.nl/item",
+                            "hangingStorage",
+                            "false"
+                        )
+                    );
+
+                    //BACKORDERS
+                    $back = $product->get_backorders();
+                    if (strcmp($back, "no") != 0) {
+                        $back = "true";
+                    } else {
+                        $back = "false";
+                    }
+                    $node->appendChild(
+                        $xml->createElementNS(
+                            "http://www.toppak.nl/item",
+                            "backOrder",
+                            $back
+                        )
+                    );
+
+                    //ENRICHED
+                    $node->appendChild(
+                        $xml->createElementNS(
+                            "http://www.toppak.nl/item",
+                            "enriched",
+                            "true"
+                        )
+                    );
+
+                    if ($isvalidate == true) {
+                        $products->appendChild($node);
+                        add_post_meta($product_id, "ecsExport", "yes");
+                        $isEmpty = $isEmpty + 1;
+                    } else {
+                        array_push($FailedOrders, $failed);
+                    }
+
+                    if ($isEmpty > 0) {
+                        //Export products
+                        $t = time();
+                        $filename = "PRD" . date("YmdHis", $t) . ".xml";
+
+                        $message->appendChild($products);
+                        $xml->appendChild($message);
+
+                        //Remove Empty fields:
+                        $xpath = new DOMXPath($xml);
+
+                        while (
+                            ($node_list = $xpath->query(
+                                "//*[not(*) and not(@*) and not(text()[normalize-space()])]"
+                            )) &&
+                            $node_list->length
+                        ) {
+                            foreach ($node_list as $node) {
+                                $node->parentNode->removeChild($node);
+                            }
                         }
 
+                        $xml->formatOutput = true;
 
-                        //End check XSD
-                        //$xml->save(ECS_DATA_PATH."/product.xml");
-                        $t = time();
-                        $filename = 'PRD' . date("YmdHis", $t) . '.xml';
-                        //$local_directory = ECS_DATA_PATH.'/product.xml';
+                        //Check XSD:
+                        $is_valid_xml = true;
 
-                        //$remote_directory = 'woocommerce_test/Productdata/';
-                        $remote_directory = $Path . '/';
-                        $success = $sftp->put($remote_directory . $filename, $xml->saveXml());
-                        global $wpdb;
-                        $table_name_ecs = $wpdb->prefix . 'ecs';
-                        $querylast = "SELECT * FROM $table_name_ecs " . "WHERE keytext = 'lastproductname'  ";
-                        $statesmeta = $wpdb->get_results($querylast);
-                        $lastname = '';
-                        if(count($statesmeta) > 0) {
-                            foreach($statesmeta as $k) {
-                                $wpdb->query($wpdb->prepare("UPDATE ".$table_name_ecs." SET type = '".$filename."' WHERE id= %d", $k->id));
-                            }
-                        } else {
-                            $wpdb->insert($table_name_ecs,
-                                array(
-                                    'type' => $filename,
-                                    'enable' => 'true',
-                                    'keytext' => 'lastproductname'
-                                )
+                        if (function_exists("libxml_use_internal_errors")) {
+                            libxml_use_internal_errors(true);
+                        }
+
+                        if (
+                            file_exists(
+                                __DIR__ .
+                                    DIRECTORY_SEPARATOR .
+                                    "schema" .
+                                    DIRECTORY_SEPARATOR .
+                                    "item.xsd"
+                            )
+                        ) {
+                            $is_valid_xml = $xml->schemaValidate(
+                                __DIR__ .
+                                    DIRECTORY_SEPARATOR .
+                                    "schema" .
+                                    DIRECTORY_SEPARATOR .
+                                    "item.xsd"
                             );
                         }
 
+                        if (!$is_valid_xml) {
+                            $validationError = "";
+
+                            if (function_exists("libxml_use_internal_errors")) {
+                                $errors = libxml_get_errors();
+                                foreach ($errors as $error) {
+                                    $validationError =
+                                        $validationError .
+                                        sprintf(
+                                            'XML error "%s" [%d] (Code %d) in %s on line %d column %d' .
+                                                "\n",
+                                            $error->message,
+                                            $error->level,
+                                            $error->code,
+                                            $error->file,
+                                            $error->line,
+                                            $error->column
+                                        );
+                                }
+
+                                libxml_clear_errors();
+                                libxml_use_internal_errors(false);
+                            }
+
+                            $failed = new Failederrors();
+                            $failed->set_orderID("");
+
+                            $failed->addError(
+                                " Product XML is invalid: " . $validationError
+                            );
+
+                            array_push($FailedOrders, $failed);
+                        } else {
+                            if (function_exists("libxml_use_internal_errors")) {
+                                libxml_clear_errors();
+                                libxml_use_internal_errors(false);
+                            }
+
+                            //End check XSD
+                            //$xml->save(ECS_DATA_PATH."/product.xml");
+                            $t = time();
+                            $filename = "PRD" . date("YmdHis", $t) . ".xml";
+                            //$local_directory = ECS_DATA_PATH.'/product.xml';
+
+                            //$remote_directory = 'woocommerce_test/Productdata/';
+                            $remote_directory = $Path . "/";
+                            $success = $sftp->put(
+                                $remote_directory . $filename,
+                                $xml->saveXml()
+                            );
+                            global $wpdb;
+                            $table_name_ecs = $wpdb->prefix . "ecs";
+                            $querylast = "SELECT * FROM $table_name_ecs " ."WHERE keytext = 'lastproductname'  ";
+                            $statesmeta = $wpdb->get_results($querylast);
+                            if (count($statesmeta) > 0) {
+                                foreach ($statesmeta as $k) {
+                                    $wpdb->query(
+                                        $wpdb->prepare(
+                                            "UPDATE " .
+                                                $table_name_ecs .
+                                                " SET type = '" .
+                                                $filename .
+                                                "' WHERE id= %d",
+                                            $k->id
+                                        )
+                                    );
+                                }
+                            } else {
+                                $wpdb->insert($table_name_ecs, [
+                                    "type" => $filename,
+                                    "enable" => "true",
+                                    "keytext" => "lastproductname",
+                                ]);
+                            }
+                        }
                     }
-
-
                 }
-            }
 
-            if(count($FailedOrders) > 0) {
-
-                $Errors = '
+                if (count($FailedOrders) > 0) {
+                    $Errors = '
 					<!DOCTYPE html>
 					    <html>
 				    	    <body><p>';
 
-                $Errors .= 'An error occurred processing  Product export file';
+                    $Errors .=
+                        "An error occurred processing  Product export file";
 
-                $Errors .= '<br><b>Message:</b><br>';
+                    $Errors .= "<br><b>Message:</b><br>";
 
-                foreach($FailedOrders as $fails) {
-                    $Errors .= '<br>';
-                    $Errors .= 'Product ID :' . $fails->get_orderID();
-                    $Errors .= '<br>';
-                    foreach($fails->get_errors() as $fail) {
-                        $Errors .= $fail;
-                        $Errors .= ' <br>';
+                    foreach ($FailedOrders as $fails) {
+                        $Errors .= "<br>";
+                        $Errors .= "Product ID :" . $fails->get_orderID();
+                        $Errors .= "<br>";
+                        foreach ($fails->get_errors() as $fail) {
+                            $Errors .= $fail;
+                            $Errors .= " <br>";
+                        }
                     }
-                }
 
-                $Errors .= '</p></body>
+                    $Errors .= '</p></body>
 						</html>';
 
-                $this->sendErrorEmail($Errors,'Product');
-
-
-
-
+                    $this->sendErrorEmail($Errors, "Product");
+                }
             }
-
-
-
-
+        } catch (\Exception $e) {
+            $error_message = $e->getMessage() . ' in ' . $e->getFile() . ' on line ' . $e->getLine();
+            $this->log($error_message);
         }
     }
 }

@@ -49,20 +49,31 @@ class PostNLOrder extends PostNLProcess
 
             // find list of states in DB
 
-            $ordersW = "";
+            $ordersW = [];
             $orderStatusArray = explode(":", $orderStatus);
 
-            $ordersW = get_posts([
-                "post_type" => "shop_order",
-                "post_status" => $orderStatusArray,
-                "posts_per_page" => 100,
-                "meta_query" => [
-                    [
-                        "key" => "ecsExport",
-                        "compare" => "NOT EXISTS",
-                    ],
-                ],
-            ]);
+            // Set up the query arguments
+            $args = array(
+                'status'      =>  $orderStatusArray, // Replace with the desired order status
+                'limit' => 100,
+                'return' => 'ids',
+                'meta_key'     => 'ecsExport', // The postmeta key field
+                'meta_compare' => 'NOT EXISTS', // The comparison argument
+            );
+
+            // Get orders based on the query arguments
+            $orders = wc_get_orders( $args );
+
+            // Loop through the orders
+            if (!empty($orders) && count($orders) > 1) {
+                foreach ( $orders as $order ) {
+                    // Access order data
+                    $ecsExport  = get_post_meta($order, 'ecsExport', true);
+                    if($ecsExport != 'yes' || $ecsExport == ''){
+                        $ordersW[] = $order;
+                    }
+                }
+            }
 
             if (empty($ordersW) && count($ordersW) < 1) {
                 return;
@@ -147,7 +158,7 @@ class PostNLOrder extends PostNLProcess
                 $processedOrders = [];
 
                 foreach ($order_split as $order) {
-                    $order = new WC_Order($order->ID);
+                    $order = new WC_Order($order);
                     $order_shipping_method_id = "l ";
 
                     $shipping_items = $order->get_items("shipping");
@@ -1227,9 +1238,9 @@ class PostNLOrder extends PostNLProcess
                             array_push($FailedOrders, $failed);
                         }
                     }
-                }
+                  }
 
-                $result = count($order_split);
+                //$result = count($order_split);
                 if ($isEmpty > 0) {
                     $t = time();
 

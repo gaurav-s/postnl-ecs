@@ -752,6 +752,7 @@ class PostNLProduct extends PostNLProcess
                         $Errors .= "Product ID :" . $fails->get_orderID();
                         $Errors .= "<br>";
                         foreach ($fails->get_errors() as $fail) {
+                            $this->log('Product XML is invalid for Product ID '. $fails->get_orderID() . ' : '.$fail);
                             $Errors .= $fail;
                             $Errors .= " <br>";
                         }

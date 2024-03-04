@@ -4,11 +4,9 @@
 function postnlecs_admin_scripts($hook) {
     if (strpos($hook, 'woocommerce_page_fulfillment_ECS') !== false) {
 
-							$dir = plugin_dir_path( __DIR__ );
-
-        wp_enqueue_style("bootstrap", $dir."/bootstrap/css/bootstrap.min.css");
+        wp_enqueue_style("bootstrap", PLUGIN_PATH."/bootstrap/css/bootstrap.min.css");
         wp_enqueue_script("jquery");
-        wp_enqueue_script("bootstrap", $dir."/bootstrap/js/bootstrap.min.js", array("jquery"), false, true);
+        wp_enqueue_script("bootstrap", PLUGIN_PATH."/bootstrap/js/bootstrap.min.js", array("jquery"), false, true);
     }
 }
 

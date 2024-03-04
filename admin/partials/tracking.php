@@ -32,7 +32,7 @@ function get_postnl_ecs_tracking_url($order)
         }
     }
 
-    $trackcode = get_post_meta($order->get_order_number(), "trackAndTraceCode", true);
+    $trackcode = get_post_meta($order->get_id(), "trackAndTraceCode", true);
 
     if (empty($trackcode)) {
         return [

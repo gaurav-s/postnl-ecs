@@ -2,6 +2,10 @@
 
 Integrator plugin for PostNL ECS
 
+Release 2.1.9 - 04-03-2024
+
+- This plugin is compatible with High-performance order storage
+
 Release 2.1.8 - 26-02-2024
 
 - This plugin is compatible with PHP version 8.2 and above.

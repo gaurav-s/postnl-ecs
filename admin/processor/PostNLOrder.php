@@ -63,13 +63,12 @@ class PostNLOrder extends PostNLProcess
 
             // Get orders based on the query arguments
             $orders = wc_get_orders( $args );
-
             // Loop through the orders
-            if (!empty($orders) && count($orders) > 1) {
+            if (!empty($orders) && count($orders) > 0) {
                 foreach ( $orders as $order ) {
                     // Access order data
                     $ecsExport  = get_post_meta($order, 'ecsExport', true);
-                    if($ecsExport != 'yes' || $ecsExport == ''){
+                    if($ecsExport != 'yes' || empty($ecsExport)){
                         $ordersW[] = $order;
                     }
                 }
@@ -1330,11 +1329,12 @@ class PostNLOrder extends PostNLProcess
 
                         foreach ($processedOrders as $processedOrderId) {
                             if ($processedOrderId) {
-                                add_post_meta(
-                                    $processedOrderId,
+                                $order = wc_get_order( $processedOrderId );
+                                $order->add_meta_data(
                                     "ecsExport",
                                     "yes"
                                 );
+                                $order->save();
                             }
                         }
 

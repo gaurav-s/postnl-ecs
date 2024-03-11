@@ -59,7 +59,6 @@ class PostNLShipment extends PostNLProcess
             $counter = 0;
             foreach ($sftp->nlist() as $filename)
             {
-                echo $filename;
                 $codesNames = explode(".xml", $filename);
 
                 if (count($codesNames) > 0)

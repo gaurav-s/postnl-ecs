@@ -318,65 +318,42 @@ class PostNLOrder extends PostNLProcess
                             )
                         ) {
                             $shippingOptionsJson = $order->get_meta(
-                                "_postnl_delivery_options"
+                                "_postnl_order_metadata"
                             );
 
-                            $shippingOptions = is_array($shippingOptionsJson)
-                                ? ""
-                                : json_decode($shippingOptionsJson, true);
+                            $shippingOptions = is_array($shippingOptionsJson) ? $shippingOptionsJson : json_decode($shippingOptionsJson,true) ;
+
 
                             if (
                                 $shippingCodePostNL === "PGE" ||
                                 $shippingCodePostNL === "03533" ||
                                 $shippingCodePostNL === "04936"
                             ) {
-                                if (isset($shippingOptions["pickupLocation"])) {
-                                    $pickupOptions =
-                                        $shippingOptions["pickupLocation"];
+                                 if(isset($shippingOptions['frontend']) && isset($shippingOptions['frontend']['dropoff_points_type']) && $shippingOptions['frontend']['dropoff_points_type'] == 'Pickup') {
+                                     $pickupOptions = $shippingOptions['frontend'];
+
                                     if (
-                                        isset($pickupOptions["postal_code"]) &&
-                                        isset($pickupOptions["street"]) &&
-                                        isset($pickupOptions["number"]) &&
-                                        isset($pickupOptions["city"])
+                                    isset($pickupOptions['dropoff_points_address_postcode'])
+                                    && isset($pickupOptions['dropoff_points_address_address_1'])
+                                    && 	isset($pickupOptions['dropoff_points_address_address_2'])
+                                    && isset($pickupOptions['dropoff_points_address_city'])
                                     ) {
-                                        $orderShipPostCode =
-                                            $pickupOptions["postal_code"]; //Set for PGE
-                                        $orderShipPostcity =
-                                            $pickupOptions["city"]; //Set Set for PGE
-                                        $orderShipPostcountry = isset(
-                                            $pickupOptions["cc"]
-                                        )
-                                            ? $pickupOptions["cc"]
-                                            : $orderShipPostcountry; //Set for PGE
-                                        $orderShipPoststreet =
-                                            $pickupOptions["street"]; //Set for PGE
-                                        $orderShipPoststreetNum =
-                                            $pickupOptions["number"]; //Set for PGE
-                                        $orderShipPostcompany = isset(
-                                            $pickupOptions["location_name"]
-                                        )
-                                            ? $pickupOptions["location_name"]
-                                            : $orderShipPostcompany;
+                                    $orderShipPostCode = $pickupOptions['dropoff_points_address_postcode']; //Set for PGE
+                                    $orderShipPostcity = $pickupOptions['dropoff_points_address_city']; //Set Set for PGE
+                                    $orderShipPostcountry = isset($pickupOptions['dropoff_points_address_country']) ? $pickupOptions['dropoff_points_address_country'] : $orderShipPostcountry ; //Set for PGE
+                                    $orderShipPoststreet =  $pickupOptions['dropoff_points_address_address_1']; //Set for PGE
+                                    $orderShipPoststreetNum = $pickupOptions['dropoff_points_address_address_2']; //Set for PGE
+                                    $orderShipPostcompany = isset($pickupOptions['dropoff_points_address_company']) ? $pickupOptions['dropoff_points_address_company'] : $orderShipPostcompany;
                                     }
                                 }
                             } else {
-                                if (isset($shippingOptions["date"])) {
-                                    $postNLdeliveryDate = strtotime(
-                                        $shippingOptions["date"]
-                                    );
+                                  if(isset($shippingOptions['frontend']['delivery_day_date'])){
+                                    $postNLdeliveryDate = strtotime($shippingOptions['frontend']['delivery_day_date']);
+                                    $postNLdeliveryDateTime = strtotime($shippingOptions['frontend']['delivery_day_from']);
 
-                                    if (
-                                        $postNLdeliveryDate >
-                                        strtotime("tomorrow")
-                                    ) {
-                                        $orderShipPostDeliveryDate = date(
-                                            "Y-m-d",
-                                            $postNLdeliveryDate
-                                        );
-                                        $orderShipPostDeliveryTime = date(
-                                            "H:i",
-                                            $postNLdeliveryDate
-                                        );
+                                    if($postNLdeliveryDate > strtotime('tomorrow')) {
+                                        $orderShipPostDeliveryDate = date('Y-m-d',$postNLdeliveryDate);
+                                        $orderShipPostDeliveryTime  = date('H:i', $postNLdeliveryDateTime);
                                     }
                                 }
                             }

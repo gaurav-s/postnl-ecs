@@ -68,6 +68,7 @@ class PostNLOrder extends PostNLProcess
                 foreach ( $orders as $order ) {
                     // Access order data
                     $ecsExport  = get_post_meta($order, 'ecsExport', true);
+                    $order = new WC_Order((int)$order);
                     $ecsExport  = !empty($ecsExport) ? $ecsExport : $order->get_meta('ecsExport');
                     if($ecsExport != 'yes' || empty($ecsExport)){
                         $ordersW[] = $order;

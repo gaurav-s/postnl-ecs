@@ -131,11 +131,11 @@ function getpostnlMappingCodes($options, $countryCode) {
                 return 'NA';
         }
 
-        if($options['deliveryType'] == 'Morning Delivery')
-            return 'Morning';
-
         if(strtolower($countryCode) !== 'nl')
             return get_outside_nl_shipping($countryCode);
+
+        if($options['deliveryType'] == 'Morning Delivery')
+            return 'Morning';
 
         if($options['deliveryType'] == 'Evening Delivery')
             return 'Evening';

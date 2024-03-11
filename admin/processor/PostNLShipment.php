@@ -116,6 +116,8 @@ class PostNLShipment extends PostNLProcess
                             }
 
                             $processedFiles = get_post_meta($intOrder, "shipmentFiles", true);
+                            $order = new WC_Order((int)$intOrder);
+                            $processedFiles = !empty($processedFiles) ? $processedFiles :  $order->get_meta('shipmentFiles');
                             if (!empty($processedFiles))
                             {
                                 $processedFilesArray = json_decode($processedFiles);
@@ -222,6 +224,8 @@ class PostNLShipment extends PostNLProcess
                                 }
 
                                 $existingtrackCode = get_post_meta($intOrder, "trackAndTraceCode", true);
+                                $existingtrackCode  = !empty($existingtrackCode) ? $existingtrackCode : $order->get_meta('trackAndTraceCode');
+
                                 if(!empty( $existingtrackCode)){
                                     $stringTrack = $stringTrack . ", " . $existingtrackCode;
                                     $order->update_meta_data( "trackAndTraceCode", $stringTrack);
@@ -239,6 +243,7 @@ class PostNLShipment extends PostNLProcess
                                 else
                                 {
                                     $exportedItems = get_post_meta($intOrder, "exportedItems", true);
+                                    $exportedItems  = !empty($exportedItems) ? $exportedItems : $order->get_meta('exportedItems');
                                     if (strlen($exportedItems) !== 0)
                                     {
                                         $itemsExported = explode(":", $exportedItems);

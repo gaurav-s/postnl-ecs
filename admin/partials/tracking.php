@@ -33,6 +33,8 @@ function get_postnl_ecs_tracking_url($order)
     }
 
     $trackcode = get_post_meta($order->get_id(), "trackAndTraceCode", true);
+    $trackcode  = !empty($trackcode) ? $trackcode : $order->get_meta('trackAndTraceCode');
+
 
     if (empty($trackcode)) {
         return [

@@ -80,33 +80,31 @@ function postnlecs_display_adminUI()
     require_once ECS_PATH . "/admin/import/inventory-import.php";
 }
 // ADDING COLUMN TITLES (Here 2 columns)
-add_filter("manage_edit-shop_order_columns", "postnlecs_shop_order_column", 11);
+add_filter("woocommerce_shop_order_list_table_columns", "postnlecs_shop_order_column", 20, 1);
 
 function postnlecs_shop_order_column($columns)
 {
-    $columns["postnlecs-export"] = __("Export Status", "theme_slug");
+    $columns["custom_column"] = __("Export Status", "theme_slug");
     return $columns;
 }
 
 // adding the data for each orders by column (example)
 add_action(
-    "manage_shop_order_posts_custom_column",
+    "woocommerce_shop_order_list_table_custom_column",
     "postnlecs_add_exportedColumn",
     10,
     2
 );
 
-function postnlecs_add_exportedColumn($column)
+function postnlecs_add_exportedColumn(string $column, WC_Order $order)
 {
-    global $the_order;
-    if (!$the_order) {
-        return;
-    }
 
-    $order_id = $the_order->get_id();
+    $order_id = $order->get_id();
     switch ($column) {
-        case "postnlecs-export":
+        case "custom_column":
             $isExported = get_post_meta($order_id, "ecsExport", true);
+             $isExported  = !empty($isExported) ? $isExported : $order->get_meta('ecsExport');
+
             if (strlen($isExported) !== 0) {
                 echo " EXPORTED ";
             } else {
@@ -129,6 +127,9 @@ function postnlecs_checkout_field_display_admin_order_meta($order)
 {
     $trackcode = get_post_meta($order->get_id(), "trackAndTraceCode", true);
     $isExported = get_post_meta($order->get_id(), "ecsExport", true);
+
+    $trackcode  = !empty($trackcode) ? $trackcode : $order->get_meta('trackAndTraceCode');
+    $isExported  = !empty($isExported) ? $isExported : $order->get_meta('ecsExport');
 
     if (strlen($isExported) !== 0) {
         echo "<h3><strong>" .

@@ -286,7 +286,7 @@ class PostNLOrder extends PostNLProcess
                             $isvalidate = false;
                         }
 
-                        $shippingCodePostNL = getPostNLEcsShippingCode(
+                       $shippingCodePostNL = getPostNLEcsShippingCode(
                             $order->get_shipping_country(),
                             $order
                         );

@@ -23,7 +23,8 @@
         $Cron = "";
         $Path = "";
         $cron = "";
-
+        $no = "";
+		
         // find list of states in DB
 
         $settingID = $EcsInventorySettings->getSettingId();
@@ -38,9 +39,12 @@
                 if ($k->keytext == "Path") {
                     $Path = $k->value;
                 }
+                if ($k->keytext == "no") {
+                    $no = $k->value;
+                }				
             }
         }
-        $EcsInventorySettings->displayInventorySettings($Cron, $Path);
+        $EcsInventorySettings->displayInventorySettings($Cron, $Path, $no);
     }
     if (isset($_POST["inventoryImport"])) {
         // handle post data
@@ -48,7 +52,8 @@
         $port = 22;
         $Cron = $_POST["Cron"];
         $Path = $_POST["Path"];
-
+        $no = $_POST["no"];
+		
         $EcsSftpProcess = ecsSftpProcess::init();
 
         $ftpCheck = $EcsSftpProcess->checkSftpSettings($Path);
@@ -60,10 +65,12 @@
                 $id = $EcsInventorySettings->saveSettings();
                 $EcsInventorySettings->saveSettingsValues($id, "Cron", $Cron);
                 $EcsInventorySettings->saveSettingsValues($id, "Path", $Path);
+				$EcsInventorySettings->saveSettingsValues($id, "no", $no);				
             } else {
                 $statesmeta = $EcsInventorySettings->getSettingValues(
                     $settingID
                 );
+				$setNo = false;
                 foreach ($statesmeta as $k) {
                     if ($k->keytext == "Cron") {
                         $EcsInventorySettings->updateSettingsValues(
@@ -77,7 +84,18 @@
                             $Path
                         );
                     }
+                    if ($k->keytext == "no") {
+                        $EcsInventorySettings->updateSettingsValues($k->id, $no);
+                        $setNo = true;
+                    }					
                 }
+                if (!$setNo) {
+                    $EcsInventorySettings->saveSettingsValues(
+                        $settingID,
+                        "no",
+                        $no
+                    );
+                }				
             }
 
             $postnlStock = new PostNLStock();
@@ -101,7 +119,7 @@
     </div>
     <?php
         }
-        $EcsInventorySettings->displayInventorySettings($Cron, $Path);
+        $EcsInventorySettings->displayInventorySettings($Cron, $Path, $no);
         echo "<script>
 $(document).ready(function(){
 $('#collapse6').collapse('show');

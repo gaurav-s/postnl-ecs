@@ -79,7 +79,7 @@ class ecsInventorySettings
         return $statesmeta;
     }
 
-    public function displayInventorySettings($Cron, $Path)
+    public function displayInventorySettings($Cron, $Path, $no)
     {
         echo '<div class="form-group">
             <label class="col-md-4 control-label" for="textinput">Path</label>
@@ -91,7 +91,18 @@ class ecsInventorySettings
             </div>
             </div>
         ';
-
+		
+        echo '<div class="form-group">
+        <label class="col-md-4 control-label" for="textinput">Number of file for cron</label>
+        <div class="col-md-4">
+        <input id="textinput" name="no" type="number" placeholder="number" required="true" class="form-control input-md" value=' .
+            $no .
+            '>
+        <span class="help-block">For example 3,5,10</span>
+        </div>
+        </div>
+        ';
+		
         postnlecs_cron_selection_display($Cron);
     }
 }

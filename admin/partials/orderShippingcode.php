@@ -23,15 +23,31 @@ function getPostNLEcsShippingCode($shippingCountry, $order) {
         if (method_exists($postNlDeliveryType, 'get_delivery_type')) {
             // Call the method with the appropriate arguments (assuming $order is defined)
             $deliveryType = $postNlDeliveryType->get_delivery_type($order);
+
+
         }
     }
     $shippingOptions = $order->get_meta('_postnl_order_metadata');
-    $found_shipping_classes = find_order_shipping_classes($order);
 
+//	$found_shipping_classes = find_order_shipping_classes($order);
+//    if(!empty($found_shipping_classes)){
+//        $shippingOptions['packageType'] = $found_shipping_classes;
+//    }
 
-    if(!empty($found_shipping_classes)){
-        $shippingOptions['packageType'] = $found_shipping_classes;
-    }
+//above code replaced/optimized by below code for version 2.2.1
+	$found_shipping_classes = find_order_shipping_classes($order);
+
+	// Check if $found_shipping_classes is an array
+	if (is_array($found_shipping_classes) && !empty($found_shipping_classes)) {
+		$shippingOptions['packageType'] = $found_shipping_classes;
+	} elseif (is_string($found_shipping_classes) && !empty($found_shipping_classes)) {
+		// Handle case when a string is returned, you can either convert it or log it
+		$shippingOptions['packageType'] = [$found_shipping_classes];  // Convert string to array
+	} else {
+		// Handle empty or invalid return value
+		//$shippingOptions['packageType'] = 'default_package';
+	}
+
 
 
     if(isset($shippingOptions['frontend']['dropoff_points_type']) && $shippingOptions['frontend']['dropoff_points_type'] == 'Pickup') {
@@ -70,12 +86,18 @@ function getPostNLEcsShippingCode($shippingCountry, $order) {
         if(isset($shipmentOptions['signature']) && ($shipmentOptions['signature'] != 0))
             $sinatureOption = '_SIG';
 
-
+//added code for version 2.2.1
+		if($order->get_meta('_postnl_letterbox') === '1' ) {
+                if( strtolower($shippingCountry) === 'nl')
+                    return '02928';
+                else
+                    return get_outside_nl_shipping($shippingCountry);
+	}
 
 
         if(isset($shippingOptions['packageType'])) {
 
-            if($shippingOptions['packageType'] == 'mailbox') {
+            if($shippingOptions['packageType'] == '_postnl_letterbox') {
                 if( strtolower($shippingCountry) === 'nl')
                     return '02928';
                 else
@@ -122,7 +144,9 @@ function getPostNLEcsShippingCode($shippingCountry, $order) {
 
 function getpostnlMappingCodes($options, $countryCode) {
     if(isset($options['deliveryType'])) {
-        if(isset($options['isPickup']) && $options['deliveryType'] == 'Pickup at PostNL Point' && $options['isPickup']){
+// Updated code below for version 2.2.1
+//		if(isset($options['isPickup']) && $options['deliveryType'] == 'Pickup at PostNL Point' && $options['isPickup']){
+		if(isset($options['isPickup']) && (($options['deliveryType'] == 'Pickup at PostNL Point') or ($options['deliveryType'] == 'Pickup at PostNL Point Belgium')) && $options['isPickup']){
             if(strtolower($countryCode) === 'nl')
                 return  '03533';
             if(strtolower($countryCode) === 'be')

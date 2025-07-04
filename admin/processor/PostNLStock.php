@@ -7,6 +7,7 @@ class PostNLStock extends PostNLProcess
             $EcsInventorySettings = ecsInventorySettings::init();
             $Path = "";
             $Cron = "";
+			$no = 10;
             $settingID = $EcsInventorySettings->getSettingId();
             if ($settingID) {
                 $statesmeta = $EcsInventorySettings->loadInventorySettings(
@@ -25,6 +26,10 @@ class PostNLStock extends PostNLProcess
                 if ($k->keytext == "Cron") {
                     $Cron = $k->value;
                 }
+                if ($k->keytext == "no")
+                {
+                    $no = $k->value;
+                }				
             }
             $sftp = $this->checkFtpSettings($Path);
 
@@ -39,7 +44,7 @@ class PostNLStock extends PostNLProcess
 
             $sftp->chdir($Path); // open directory 'test'
             $endPath = $sftp->pwd();
-
+			$counter = 0;
             foreach ($sftp->nlist() as $filename) {
                 $codesNames = explode(".xml", $filename);
                 if (count($codesNames) > 0) {
@@ -50,7 +55,16 @@ class PostNLStock extends PostNLProcess
                     //$sftp->get($sftp->pwd() . '/' . $filename, ECS_DATA_PATH."/".$filename);
                     //if (file_exists(ECS_DATA_PATH."/".$filename) && filesize(ECS_DATA_PATH."/".$filename) > 0) {
                     //$xml = simplexml_load_file(ECS_DATA_PATH."/".$filename, 'SimpleXMLElement', LIBXML_NOWARNING);
-                    $stockFileData = $sftp->get($sftp->pwd() . "/" . $filename);
+                    //  $xml = simplexml_load_file(ECS_DATA_PATH."/".$filename, 'SimpleXMLElement', LIBXML_NOWARNING);
+                    
+					$counter++;
+                    if ($counter > $no)
+                    {
+                        break; // Exit the loop if $no files have been processed
+
+                    }
+					
+					$stockFileData = $sftp->get($sftp->pwd() . "/" . $filename);
                     if ($stockFileData) {
                         $xml = simplexml_load_string(
                             $stockFileData,

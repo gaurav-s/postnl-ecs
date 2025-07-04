@@ -72,7 +72,7 @@ class PostNLShipment extends PostNLProcess
                     //if(file_exists(ECS_DATA_PATH."/".$filename) && filesize(ECS_DATA_PATH."/".$filename) > 0) {
                     //  $xml = simplexml_load_file(ECS_DATA_PATH."/".$filename, 'SimpleXMLElement', LIBXML_NOWARNING);
                     $counter++;
-                    if ($counter >= $no)
+                    if ($counter > $no)
                     {
                         break; // Exit the loop if $no files have been processed
 

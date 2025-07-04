@@ -2,6 +2,10 @@
 
 Integrator plugin for PostNL ECS
 
+Release 2.2.2 - 04-07-2025
+
+- Compatible with the latest WordPress version and PHP 8.3
+
 Release 2.2.1 - 07-10-2024
 
 - Compatibility update for PostNL for WooCommerce plugin

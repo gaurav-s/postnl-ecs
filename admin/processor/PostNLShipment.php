@@ -341,7 +341,7 @@ class PostNLShipment extends PostNLProcess
             $email = "";
             $table_name_ecs = $wpdb->prefix . "ecs";
             // find list of states in DB
-            $qry = "SELECT * FROM " . $table_name_ecs . " WHERE keytext ='general' ORDER BY id DESC  LIMIT 1";
+            $qry = $wpdb->prepare("SELECT * FROM $table_name_ecs WHERE keytext = %s ORDER BY id DESC LIMIT 1", 'general');
             $states = $wpdb->get_results($qry);
             $settingID = "";
             foreach ($states as $k)
@@ -350,7 +350,7 @@ class PostNLShipment extends PostNLProcess
             }
             // find list of states in DB
             $table_name = $wpdb->prefix . "ecsmeta";
-            $qrymeta = "SELECT * FROM " . $table_name . " WHERE settingid = '" . $settingID . "'";
+            $qrymeta = $wpdb->prepare("SELECT * FROM $table_name WHERE settingid = %d", $settingID);
             $statesmeta = $wpdb->get_results($qrymeta);
 
             foreach ($statesmeta as $k)

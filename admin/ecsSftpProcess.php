@@ -26,7 +26,7 @@ class ecsSftpProcess
         $message = "";
 
         if (!empty($settingID)) {
-            $qrymeta = "SELECT * FROM $table_name " . "WHERE settingid = $settingID  ";
+            $qrymeta = $wpdb->prepare("SELECT * FROM $table_name WHERE settingid = %d", $settingID);
             $statesmeta = $wpdb->get_results($qrymeta);
             foreach ($statesmeta as $k) {
                 if ($k->keytext == "PrivateKey") {
@@ -92,7 +92,7 @@ class ecsSftpProcess
     {
         global $wpdb;
         $table_name_ecs = $wpdb->prefix . "ecs";
-        $qry = "SELECT * FROM $table_name_ecs " ."WHERE keytext ='sftp' ORDER BY id DESC LIMIT 1 ";
+        $qry = $wpdb->prepare("SELECT * FROM $table_name_ecs WHERE keytext = %s ORDER BY id DESC LIMIT 1", 'sftp');
         $states = $wpdb->get_results($qry);
         $settingID = "";
         foreach ($states as $k) {
@@ -106,7 +106,7 @@ class ecsSftpProcess
     {
         global $wpdb;
         $table_name = $wpdb->prefix . "ecsmeta";
-        $qrymeta = "SELECT * FROM $table_name " . "WHERE settingid = $settingID  ";
+        $qrymeta = $wpdb->prepare("SELECT * FROM $table_name WHERE settingid = %d", $settingID);
         $statesmeta = $wpdb->get_results($qrymeta);
 
         return $statesmeta;
@@ -141,7 +141,7 @@ class ecsSftpProcess
         global $wpdb;
         $table_name = $wpdb->prefix . "ecsmeta";
         $wpdb->query(
-            $wpdb->prepare("UPDATE $table_name  SET value = '$value' WHERE id= %d", $id)
+            $wpdb->prepare("UPDATE $table_name SET value = %s WHERE id = %d", $value, $id)
         );
     }
 
@@ -149,7 +149,7 @@ class ecsSftpProcess
     {
         global $wpdb;
         $table_name = $wpdb->prefix . "ecsmeta";
-        $qrymeta = "SELECT * FROM $table_name " . "WHERE settingid = $settingID  ";
+        $qrymeta = $wpdb->prepare("SELECT * FROM $table_name WHERE settingid = %d", $settingID);
         $statesmeta = $wpdb->get_results($qrymeta);
         return $statesmeta;
     }

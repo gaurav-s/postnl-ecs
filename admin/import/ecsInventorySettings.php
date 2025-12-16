@@ -16,7 +16,7 @@ class ecsInventorySettings
         // find list of states in DB
         global $wpdb;
         $table_name = $wpdb->prefix . "ecsmeta";
-        $qrymeta = "SELECT * FROM $table_name " . "WHERE settingid = $settingID  ";
+        $qrymeta = $wpdb->prepare("SELECT * FROM $table_name WHERE settingid = %d", $settingID);
         $statesmeta = $wpdb->get_results($qrymeta);
 
         return $statesmeta;
@@ -26,7 +26,7 @@ class ecsInventorySettings
     {
         global $wpdb;
         $table_name_ecs = $wpdb->prefix . "ecs";
-        $qry = "SELECT * FROM  	$table_name_ecs " ."WHERE keytext ='inventoryImport' ORDER BY id DESC  LIMIT 1 ";
+        $qry = $wpdb->prepare("SELECT * FROM $table_name_ecs WHERE keytext = %s ORDER BY id DESC LIMIT 1", 'inventoryImport');
         $states = $wpdb->get_results($qry);
         $settingID = "";
         foreach ($states as $k) {
@@ -65,7 +65,9 @@ class ecsInventorySettings
         $table_name = $wpdb->prefix . "ecsmeta";
         $wpdb->query(
             $wpdb->prepare(
-                "UPDATE $table_name  SET value = '$value' WHERE id= %d", $id
+                "UPDATE $table_name SET value = %s WHERE id = %d",
+                $value,
+                $id
             )
         );
     }
@@ -74,7 +76,7 @@ class ecsInventorySettings
     {
         global $wpdb;
         $table_name = $wpdb->prefix . "ecsmeta";
-        $qrymeta = "SELECT * FROM $table_name " . "WHERE settingid = $settingID  ";
+        $qrymeta = $wpdb->prepare("SELECT * FROM $table_name WHERE settingid = %d", $settingID);
         $statesmeta = $wpdb->get_results($qrymeta);
         return $statesmeta;
     }

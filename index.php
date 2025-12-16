@@ -8,9 +8,10 @@
 	Author URI: http://www.postnl.nl/
 	Text Domain: woocommercepostnlfulfillment
 	Requires at least: 6.6
- Requires PHP: 8.3
+ 	Requires PHP: 8.4
 	WC requires at least: 7.6
- WC tested up to: 9.9.5
+ 	WC tested up to: 10.3.6
+	WP tested up to: 6.9.0
 	*/
 
 	/**

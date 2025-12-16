@@ -2,6 +2,12 @@
 
 Integrator plugin for PostNL ECS
 
+Release 2.2.3 - 16-12-2025
+
+- Compatible with the latest WordPress version 6.9 and PHP 8.4
+- Compatible with the latest WooCommerce version 10.3.6
+- Update code to fix direct sql query with $wpdb->prepare function.
+
 Release 2.2.2 - 04-07-2025
 
 - Compatible with the latest WordPress version and PHP 8.3

@@ -12,6 +12,7 @@
    <fieldset>
     <!-- Form Name -->
     <legend></legend>
+    <?php wp_nonce_field('postnl_general_settings', 'postnl_general_nonce'); ?>
     <?php if (!isset($_POST["general"])) {
         global $wpdb;
         $name = "";
@@ -19,7 +20,7 @@
 
         $table_name_ecs = $wpdb->prefix . "ecs";
         // find list of states in DB
-        $qry = "SELECT * FROM $table_name_ecs " ."WHERE keytext ='general' ORDER BY id DESC  LIMIT 1 ";
+        $qry = $wpdb->prepare("SELECT * FROM $table_name_ecs WHERE keytext = %s ORDER BY id DESC LIMIT 1", 'general');
         $states = $wpdb->get_results($qry);
         $settingID = "";
         foreach ($states as $k) {
@@ -28,7 +29,7 @@
         // find list of states in DB
         $table_name = $wpdb->prefix . "ecsmeta";
         if (!empty($settingID)) {
-            $qrymeta = "SELECT * FROM $table_name " . "WHERE settingid = $settingID  ";
+            $qrymeta = $wpdb->prepare("SELECT * FROM $table_name WHERE settingid = %d", $settingID);
             $statesmeta = $wpdb->get_results($qrymeta);
             foreach ($statesmeta as $k) {
                 if ($k->keytext == "Name") {
@@ -114,7 +115,7 @@
             }
             // find list of states in DB
             $table_name = $wpdb->prefix . "ecsmeta";
-            $qrymeta = "SELECT * FROM $table_name " . "WHERE settingid = $settingID  ";
+            $qrymeta = $wpdb->prepare("SELECT * FROM $table_name WHERE settingid = %d", $settingID);
             $statesmeta = $wpdb->get_results($qrymeta);
             foreach ($statesmeta as $k) {
                 global $wpdb;
@@ -122,13 +123,13 @@
                     global $wpdb;
                     $table_name = $wpdb->prefix . "ecsmeta";
                     $update1 = $wpdb->query(
-                        $wpdb->prepare("UPDATE $table_name  SET value = '$Name' WHERE id= %d", $k->id)
+                        $wpdb->prepare("UPDATE $table_name SET value = %s WHERE id = %d", $Name, $k->id)
                     );
                 }
 
                 if ($k->keytext == "Email") {
                     $wpdb->query(
-                        $wpdb->prepare("UPDATE $table_name SET value = '$Email' WHERE  id= %d", $k->id)
+                        $wpdb->prepare("UPDATE $table_name SET value = %s WHERE id = %d", $Email, $k->id)
                     );
                 }
             }

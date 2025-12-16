@@ -1,17 +1,17 @@
 <?php
 	/*
-	Plugin Name: WooCommerce PostNL-Fulfilment
-	Plugin URI: http://www.postnl.nl/
-	Description: PostNL Fulfilment plugin for WooCommerce
-	Version: 2.2.2
-	Author: PostNL
-	Author URI: http://www.postnl.nl/
-	Text Domain: woocommercepostnlfulfillment
-	Requires at least: 6.6
- 	Requires PHP: 8.4
-	WC requires at least: 7.6
- 	WC tested up to: 10.3.6
-	WP tested up to: 6.9.0
+		Plugin Name: WooCommerce PostNL-Fulfilment
+		Plugin URI: http://www.postnl.nl/
+		Description: PostNL Fulfilment plugin for WooCommerce
+		Version: 2.2.3
+		Author: PostNL
+		Author URI: http://www.postnl.nl/
+		Text Domain: woocommercepostnlfulfillment
+		Requires at least: 6.6
+		Requires PHP: 8.3
+		WC requires at least: 7.6
+		WC tested up to: 10.3.6
+		WP tested up to: 6.9.0
 	*/
 
 	/**

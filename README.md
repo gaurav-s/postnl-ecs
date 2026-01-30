@@ -2,6 +2,10 @@
 
 Integrator plugin for PostNL ECS
 
+Release 2.2.4 - 30-01-2026
+
+- We set shippingcode as 04952 to new code 04907
+
 Release 2.2.3 - 16-12-2025
 
 - Compatible with the latest WordPress version 6.9 and PHP 8.4

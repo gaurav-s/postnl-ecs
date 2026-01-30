@@ -306,7 +306,7 @@ class PostNLOrder extends PostNLProcess
 
                         //For PGE address
                         $shippingCodeArrayskip = [
-                            "04952",
+                            "04907",
                             "04945",
                             "04946",
                             "NA",

@@ -209,7 +209,7 @@ function get_outside_nl_shipping($countryCode) {
     if(strtoupper($countryCode) == 'BE')
         return '04946';
     if(ecs_eu_country_check(strtoupper($countryCode)))
-        return '04952';
+        return '04907';
     else
         return '04945';
 
